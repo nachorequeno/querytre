@@ -18,8 +18,7 @@ def eval(df, expr, timescale=1, projection=None, dtype="int", **kwargs):
     evaluator = QueryEvaluator(df, dtype, **kwargs)
     zones = evaluator.visit(tree)
 
-
-    if projection == None:
+    if projection is None:
         result = zones
     elif projection == 'span':
         result = [(z.bmin().value/timescale, z.emax().value/timescale) for z in zones]
