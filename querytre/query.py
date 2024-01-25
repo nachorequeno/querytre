@@ -97,7 +97,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Grouping.
     def visitGrouping(self, ctx:QueryParser.GroupingContext):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.child)
 
 
     # Visit a parse tree produced by QueryParser#Difference.
