@@ -1,4 +1,24 @@
-# Antlr4
+# QueryTRE
+QueryTRE is a fork of [Timedrel] and [Montre] that exports Timed Regular Expressions to [ParetoLib].
+
+[Timedrel]: https://github.com/doganulus/timedrel
+[Montre]: https://github.com/doganulus/montre
+[ParetoLib]: https://gricad-gitlab.univ-grenoble-alpes.fr/verimag/tempo/multidimensional_search
+
+# Installation
+In order to install QueryTRE, run the following commands:
+
+``
+pip3 install .
+``
+
+Alternatively, you can compile and pack the library into a *.whl file.
+
+``
+python3 setup.py bdist_wheel --universlal --force-reinstall
+pip3 install ./dist/querytre-0.1.0-py3-none-any.whl 
+``
+# Dependencies: Antlr4
 Lexer and parser.py files in **querytre/parser** folder are automatically generated using Antlr4 (version 4.7.13). 
 In order to correctly import this module in Python, you must install the exact version it was compiled for:
 
