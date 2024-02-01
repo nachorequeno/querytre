@@ -89,15 +89,15 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Diamond.
     def visitDiamond(self, ctx: QueryParser.DiamondContext):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.child)
 
     # Visit a parse tree produced by QueryParser#Box.
     def visitBox(self, ctx: QueryParser.BoxContext):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.child)
 
     # Visit a parse tree produced by QueryParser#Grouping.
     def visitGrouping(self, ctx: QueryParser.GroupingContext):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.child)
 
     # Visit a parse tree produced by QueryParser#Difference.
     def visitDifference(self, ctx: QueryParser.DifferenceContext):
@@ -137,7 +137,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Question.
     def visitQuestion(self, ctx: QueryParser.QuestionContext):
-        return self.visitChildren(ctx)
+        return self.visit(ctx.child)
 
     # Visit a parse tree produced by QueryParser#Plus.
     def visitPlus(self, ctx: QueryParser.PlusContext):
