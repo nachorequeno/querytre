@@ -31,6 +31,9 @@ friend std::ostream& operator<<(std::ostream &os, const bound<T1>&);
      * The max is divided by 2 to prevent overflow since we currently 
      * need to add two numbers in several operations.
      */
+     /* TODO: infinity, minus_infinity and zero might be buggy depending on the T datatype.
+     They only work for int and rational, and might fail for float/doubles (Kleene+). The fix consists on
+     detecting the type T when casting, and raising an error.*/
     constexpr static T infinity = (std::numeric_limits<T>::has_infinity) ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max()/2;
     constexpr static T minus_infinity = (std::numeric_limits<T>::has_infinity) ? std::numeric_limits<T>::infinity() : -std::numeric_limits<T>::max()/2;
 
