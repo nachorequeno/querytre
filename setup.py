@@ -5,6 +5,8 @@ ext_instance_int = Pybind11Extension(
     'timedrel_ext_int',
     sources=['querytre/boost/timedrel_ext_int.cpp'],
     include_dirs=['include'],
+    cxx_std=11
+    # language='c++'
     # libraries=['boost_python3'],
 )
 
@@ -12,6 +14,8 @@ ext_instance_float = Pybind11Extension(
     'timedrel_ext_float',
     sources=['querytre/boost/timedrel_ext_float.cpp'],
     include_dirs=['include'],
+    cxx_std=11
+    # language = 'c++',
     # libraries=['boost_python3'],
 )
 
