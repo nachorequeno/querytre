@@ -1,4 +1,4 @@
-import timedrel_ext_int as ext
+import timedrel.timedrel_ext_int as ext
 
 class zoneset(object):
     """docstring for zoneset"""
