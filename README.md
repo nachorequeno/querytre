@@ -15,7 +15,10 @@ pip3 install .
 Alternatively, you can compile and pack the library into a *.whl file.
 
 ``
-python3 setup.py bdist_wheel --universlal --force-reinstall
+python3 setup.py bdist_wheel --universal --force-reinstall
+``
+
+``
 pip3 install ./dist/querytre-0.1.0-py3-none-any.whl 
 ``
 
