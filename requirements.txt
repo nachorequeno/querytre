@@ -1,2 +1,4 @@
 antlr4-python3-runtime==4.7.1
 pybind11>=2.11
+setuptools>=63.2.0
+wheel>=0.41.3
