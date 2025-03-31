@@ -4,6 +4,7 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
+#include <sstream>
  
 #include "zone.hpp"
 
@@ -223,6 +224,16 @@ public:
     }
     void add_from_period_both_anchor(value_type begin, value_type end){
         add(zone_type::make_from_period_both_anchor(begin, end));
+    }
+
+    std::string toString() const {
+        std::string s="[";
+        for(auto zit = this->cbegin(); zit != this->cend(); zit++){
+            s += "("+timedrel::to_string(*zit)+"),\n";
+        }
+        s += "]";
+
+        return s;
     }
 
     static zone_set_type filter(const zone_set_type &zs){
@@ -1016,6 +1027,13 @@ inline bool operator!=(
     const zone_set<T, Container>& rhs){ 
 
     return !(lhs.container == rhs.container); 
+}
+
+template<typename T, typename Container>
+inline std::string to_string(const zone_set<T, Container>& zs) {
+    std::ostringstream ss;
+    ss << zs;
+    return ss.str();
 }
 
 } //namespace timedrel

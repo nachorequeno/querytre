@@ -54,6 +54,7 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
     ;
 
     py::class_<zone_set_type>(m, "zone_set")
+        .def(py::init<>())
         .def<void (zone_set_type::*)(const zone_type&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&, const std::array<bool, 6>&)>("add", &zone_set_type::add)
@@ -64,6 +65,7 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
         .def("empty", &zone_set_type::empty)
         .def("__iter__", [](const zone_set_type &s) { return py::make_iterator(s.cbegin(), s.cend()); },
                          py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def("__str__", &zone_set_type::toString)
     ;
 
     m.def("filter", &zone_set_type::filter);

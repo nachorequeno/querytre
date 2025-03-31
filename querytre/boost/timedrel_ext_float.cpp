@@ -65,6 +65,7 @@ PYBIND11_MODULE(timedrel_ext_float, m) {
         .def("empty", &zone_set_type::empty)
         .def("__iter__", [](const zone_set_type &s) { return py::make_iterator(s.cbegin(), s.cend()); },
                          py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def("__str__", &zone_set_type::toString)
     ;
 
     m.def("filter", &zone_set_type::filter);

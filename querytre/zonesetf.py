@@ -182,5 +182,8 @@ class zoneset(object):
             raise ValueError("Unknown relation")
         
     def __str__(self):
-        return "\n".join([str(zone) for zone in self.container])
+        return str(self.container)
+
+    def __repr__(self):
+        return f"zoneset({str(self.container)})"
 

@@ -3,6 +3,7 @@
 #include <limits>
 #include <cstdint>
 #include <iostream>
+#include <sstream>
 
 #include "bound.hpp"
 
@@ -270,6 +271,13 @@ public:
     }
 
 };
+
+template <typename T>
+inline std::string to_string(const zone<T>& z) {
+    std::ostringstream ss;
+    ss << z;
+    return ss.str();
+}
 
 } // namespace timedrel
 
