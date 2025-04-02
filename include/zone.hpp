@@ -273,7 +273,7 @@ public:
 };
 
 template <typename T>
-inline std::string to_string(const zone<T>& z) {
+inline std::string toString(const zone<T>& z) {
     std::ostringstream ss;
     ss << z;
     return ss.str();

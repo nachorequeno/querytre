@@ -229,7 +229,7 @@ public:
     std::string toString() const {
         std::string s="[";
         for(auto zit = this->cbegin(); zit != this->cend(); zit++){
-            s += "("+timedrel::to_string(*zit)+"),\n";
+            s += "("+timedrel::toString(*zit)+"),\n";
         }
         s += "]";
 
@@ -1030,7 +1030,7 @@ inline bool operator!=(
 }
 
 template<typename T, typename Container>
-inline std::string to_string(const zone_set<T, Container>& zs) {
+inline std::string toString(const zone_set<T, Container>& zs) {
     std::ostringstream ss;
     ss << zs;
     return ss.str();
