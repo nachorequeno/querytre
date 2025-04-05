@@ -6,6 +6,10 @@
 #include <algorithm>
 #include <sstream>
  
+#include <string>
+#include <gmpxx.h>
+#include <type_traits>
+
 #include "zone.hpp"
 
 namespace timedrel {
@@ -225,6 +229,37 @@ public:
     void add_from_period_both_anchor(value_type begin, value_type end){
         add(zone_type::make_from_period_both_anchor(begin, end));
     }
+
+    // Note start: These functions add zones only for rationals. For other types nothing is added.
+    void add_from_period_string(const std::string &begin, const std::string &end){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qbegin(begin);
+            mpq_class qend(end);
+            add(zone_type::make_from_period(qbegin, qend));
+        }
+    }
+    void add_from_period_rise_anchor_string(const std::string &begin, const std::string &end){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qbegin(begin);
+            mpq_class qend(end);
+            add(zone_type::make_from_period_rise_anchor(qbegin, qend));
+        }
+    }
+    void add_from_period_fall_anchor_string(const std::string &begin, const std::string &end){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qbegin(begin);
+            mpq_class qend(end);
+            add(zone_type::make_from_period_fall_anchor(qbegin, qend));
+        }
+    }
+    void add_from_period_both_anchor_string(const std::string &begin, const std::string &end){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qbegin(begin);
+            mpq_class qend(end);
+            add(zone_type::make_from_period_both_anchor(qbegin, qend));
+        }
+    }
+    // Note end:
 
     std::string toString() const {
         std::string s="[";
