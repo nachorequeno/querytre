@@ -717,6 +717,27 @@ public:
     }
 
     /**
+     *  @brief  Duration restriction operation
+     *  @param  arg  A string.
+     *  @return %zone_set
+     *
+     *  For rationals returns a set of timed periods whose durations are in (dmin, dmax] and that are in the zone set given
+     *  for other types returns empty zone set
+     */
+    static zone_set_type duration_restriction_string(
+        const zone_set_type& zs,
+        const std::string &dmin,
+        const std::string &dmax){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qdmin(dmin);
+            mpq_class qdmax(dmax);
+            return duration_restriction(zs, lower_bound_type::open(qdmin), upper_bound_type::closed(qdmax));
+        }else{
+            return zone_set();
+        }
+    }
+
+    /**
      *  @brief  Complementation operation for a single zone
      *  @param  z      A %zone
      *  @return result A %zone_set
@@ -997,6 +1018,65 @@ public:
         return zone_set_type::diamond_finished_by(zs, lower_bound_type::open(a), upper_bound_type::closed(b));
     }
 
+    // Note start: To support rationals we provide string inputs
+    // Return empty zone set if not rational zone sets
+    static zone_set_type diamond_meets_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_meets(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type diamond_met_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_met_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type diamond_starts_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_starts(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type diamond_started_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_started_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type diamond_finishes_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_finishes(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type diamond_finished_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::diamond_finished_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    // Note end:
+
+
     static zone_set_type box_meets(const zone_set_type& zs, const lower_bound_type lbound, const upper_bound_type ubound){
         return zone_set_type::complementation(diamond_meets(zone_set_type::complementation(zs), lbound, ubound));
     }
@@ -1034,6 +1114,64 @@ public:
     static zone_set_type box_finished_by(const zone_set_type& zs, const value_type a, const value_type b){
         return zone_set_type::box_finished_by(zs, lower_bound_type::open(a), upper_bound_type::closed(b));
     }
+
+    // Note start: To support rationals we provide string inputs
+    // Return empty zone set if not rational zone sets
+    static zone_set_type box_meets_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_meets(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type box_met_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_met_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type box_starts_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_starts(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type box_started_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_started_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type box_finishes_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_finishes(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    static zone_set_type box_finished_by_string(const zone_set_type& zs, const std::string &a, const std::string &b){
+        if(std::is_same<mpq_class,T>::value){
+            mpq_class qa(a);
+            mpq_class qb(b);
+            return zone_set_type::box_finished_by(zs, lower_bound_type::open(qa), upper_bound_type::closed(qb));
+        }else{
+            return zone_set();
+        }
+    }
+    // Note end:
 
 };
 

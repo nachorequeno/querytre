@@ -9,6 +9,8 @@ import io
 
 from PIL import Image
 
+# [TODO] Decide if we want to use overloading of getitem for duration restriction and modal operations
+
 class zoneset(object):
     """docstring for zoneset"""
     def __init__(self, data=None):
@@ -133,7 +135,8 @@ class zoneset(object):
 
         return zoneset(result)
 
-    # [TODO] We cannot directly pass lower and upper bounds as rationals
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def duration_restriction(cls, zset, lower, upper):
         return zoneset(ext.duration_restriction(zset.container, lower, upper))
@@ -158,7 +161,8 @@ class zoneset(object):
     def transitive_closure(cls, zset):
         return zoneset(ext.transitive_closure(zset.container))
 
-    # [TODO] Cannot directly pass lower and upper bounds as rationals
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def modal_diamond(cls, zset, relation, lower, upper):
         if relation == "meets" or relation == "A":
@@ -176,7 +180,8 @@ class zoneset(object):
         else:
             raise ValueError("Unknown relation")
 
-    # [TODO] Cannot directly pass lower and upper bounds as rationals
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def modal_box(cls, zset, relation, lower, upper):
         if relation == "meets" or relation == "A":

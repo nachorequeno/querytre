@@ -79,7 +79,7 @@ PYBIND11_MODULE(timedrel_ext_rational, m) {
 
     // Set operations
     m.def<zone_set_type (*)(const zone_set_type&)>("complementation", &zone_set_type::complementation);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("duration_restriction", &zone_set_type::duration_restriction);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string &, const std::string &)>("duration_restriction", &zone_set_type::duration_restriction_string);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("union", &zone_set_type::set_union);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("intersection", &zone_set_type::intersection);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("difference", &zone_set_type::set_difference);
@@ -89,16 +89,16 @@ PYBIND11_MODULE(timedrel_ext_rational, m) {
     m.def<zone_set_type (*)(const zone_set_type&)>("transitive_closure", &zone_set_type::transitive_closure);
 
     // Modal operations of the logic of time periods
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_starts", &zone_set_type::diamond_starts);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_started_by", &zone_set_type::diamond_started_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_finishes", &zone_set_type::diamond_finishes);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_finished_by", &zone_set_type::diamond_finished_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_meets", &zone_set_type::diamond_meets);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_met_by", &zone_set_type::diamond_met_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_starts", &zone_set_type::box_starts);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_started_by", &zone_set_type::box_started_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_finishes", &zone_set_type::box_finishes);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_finished_by", &zone_set_type::box_finished_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_meets", &zone_set_type::box_meets);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_met_by", &zone_set_type::box_met_by);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_starts", &zone_set_type::diamond_starts_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_started_by", &zone_set_type::diamond_started_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_finishes", &zone_set_type::diamond_finishes_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_finished_by", &zone_set_type::diamond_finished_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_meets", &zone_set_type::diamond_meets_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_met_by", &zone_set_type::diamond_met_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_starts", &zone_set_type::box_starts_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_started_by", &zone_set_type::box_started_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_finishes", &zone_set_type::box_finishes_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_finished_by", &zone_set_type::box_finished_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_meets", &zone_set_type::box_meets_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_met_by", &zone_set_type::box_met_by_string);
 }
