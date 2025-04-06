@@ -34,18 +34,14 @@ friend std::ostream& operator<<(std::ostream &os, const bound<T1>&);
      * need to add two numbers in several operations.
      */
     static T infinity(){
-        return (!std::is_same<mpq_class,T>::value)?
-        ((std::numeric_limits<T>::has_infinity) ?
+        return (std::numeric_limits<T>::has_infinity) ?
         std::numeric_limits<T>::infinity() :
-        std::numeric_limits<T>::max()/2):
-        mpq_class(std::numeric_limits<double>::max());
+        std::numeric_limits<T>::max()/2;
     }
     static T minus_infinity(){
-        return (!std::is_same<mpq_class,T>::value)?
-        ((std::numeric_limits<T>::has_infinity) ?
+        return (std::numeric_limits<T>::has_infinity) ?
         std::numeric_limits<T>::infinity() :
-        -std::numeric_limits<T>::max()/2):
-        mpq_class(-std::numeric_limits<double>::max());
+        -std::numeric_limits<T>::max()/2;
     }
 
     
@@ -82,6 +78,16 @@ friend std::ostream& operator<<(std::ostream &os, const bound<T1>&);
     }
 
 };
+
+template <>
+mpq_class bound<mpq_class>::infinity(){
+    return mpq_class(std::numeric_limits<double>::max());
+}
+
+template <>
+mpq_class bound<mpq_class>::minus_infinity(){
+    return mpq_class(-std::numeric_limits<double>::max());
+}
 
 template <class T>
 struct lower_bound : bound<T>{
