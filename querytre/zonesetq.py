@@ -69,6 +69,11 @@ class zoneset(object):
     def empty(self):
         return self.container.empty()
 
+    # Python default float is C++ double
+    def get_as_float(self):
+        from .zonesetf import zoneset as zonesetf
+        return zonesetf(self.container.get_as_python_float())
+
     @classmethod
     def from_periods(cls, periods, anchor=None):
 

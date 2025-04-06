@@ -60,6 +60,7 @@ PYBIND11_MODULE(timedrel_ext_rational, m) {
         .def<void (zone_set_type::*)(const zone_type&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&, const std::array<bool, 6>&)>("add", &zone_set_type::add)
+        .def("get_as_python_float", &zone_set_type::get_as_double) // Python float is C++ double
         .def("add_from_period", &zone_set_type::add_from_period)
         .def("add_from_period_rise_anchor", &zone_set_type::add_from_period_rise_anchor)
         .def("add_from_period_fall_anchor", &zone_set_type::add_from_period_fall_anchor)

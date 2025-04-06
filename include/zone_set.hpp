@@ -36,6 +36,28 @@ zone<mpq_class> get_rationals_zone_from_double_zone(const zone<double> &z){
     return zone<mpq_class>::make(values, signs);
 }
 
+zone<double> get_double_zone_from_rationals_zone(const zone<mpq_class> &z){
+    std::array<double, 6> values;
+    std::array<bool, 6> signs;
+
+    values[0] = z.get_bmin().value.get_d();
+    values[1] = z.get_bmax().value.get_d();
+    values[2] = z.get_emin().value.get_d();
+    values[3] = z.get_emax().value.get_d();
+    values[4] = z.get_dmin().value.get_d();
+    values[5] = z.get_dmax().value.get_d();
+
+    signs[0] = z.get_bmin().sign;
+    signs[1] = z.get_bmax().sign;
+    signs[2] = z.get_emin().sign;
+    signs[3] = z.get_emax().sign;
+    signs[4] = z.get_dmin().sign;
+    signs[5] = z.get_dmax().sign;
+
+    return zone<double>::make(values, signs);
+}
+
+
 template <class T>
 struct earlier_bmin {
     inline bool operator() (const zone<T>& z1, const zone<T>& z2){
@@ -263,6 +285,19 @@ public:
         }
 
         return zsq;
+    }
+
+    zone_set<double> get_as_double() const{
+        // Create an empty zone_set with rationals
+        zone_set<double> zsd;
+
+        if(std::is_same<mpq_class,T>::value){
+            for(auto it = this->cbegin(); it != this->cend(); it++){
+                zsd.add(get_double_zone_from_rationals_zone(*it));
+            }
+        }
+
+        return zsd;
     }
 
     // Note start: These functions add zones only for rationals. For other types nothing is added.

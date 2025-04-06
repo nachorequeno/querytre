@@ -36,3 +36,5 @@ print('---------------------------------------')
 zf = zonesetf.from_periods([(0.125,0.25)])
 print('as floats:', zf)
 print('as rationals:', zf.get_as_rationals())
+
+print('zq2 as float:', zq2.get_as_float())
