@@ -1,3 +1,5 @@
+from .zonesetq import zoneset as zonesetq
+
 import timedrel.timedrel_ext_float as ext
 
 import matplotlib.pyplot as plt
@@ -65,6 +67,9 @@ class zoneset(object):
 
     def empty(self):
         return self.container.empty()
+
+    def get_as_rationals(self):
+        return zonesetq(self.container.get_as_rationals())
 
     @classmethod
     def from_periods(cls, periods, anchor=None):

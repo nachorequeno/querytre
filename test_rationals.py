@@ -1,4 +1,5 @@
 from querytre import zonesetq
+from querytre import zonesetf
 
 zq1 = zonesetq()
 print(zq1)
@@ -30,3 +31,8 @@ print(zonesetq.modal_box(zq3, "B", "15/100", "2/10"))
 print(zonesetq.modal_box(zq3, "Bi", "15/100", "2/10"))
 print(zonesetq.modal_box(zq3, "E", "15/100", "2/10"))
 print(zonesetq.modal_box(zq3, "Ei", "15/100", "2/10"))
+
+print('---------------------------------------')
+zf = zonesetf.from_periods([(0.125,0.25)])
+print('as floats:', zf)
+print('as rationals:', zf.get_as_rationals())

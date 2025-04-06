@@ -15,6 +15,27 @@
 
 namespace timedrel {
 
+zone<mpq_class> get_rationals_zone_from_double_zone(const zone<double> &z){
+    std::array<mpq_class, 6> values;
+    std::array<bool, 6> signs;
+
+    values[0] = mpq_class(z.get_bmin().value);
+    values[1] = mpq_class(z.get_bmax().value);
+    values[2] = mpq_class(z.get_emin().value);
+    values[3] = mpq_class(z.get_emax().value);
+    values[4] = mpq_class(z.get_dmin().value);
+    values[5] = mpq_class(z.get_dmax().value);
+
+    signs[0] = z.get_bmin().sign;
+    signs[1] = z.get_bmax().sign;
+    signs[2] = z.get_emin().sign;
+    signs[3] = z.get_emax().sign;
+    signs[4] = z.get_dmin().sign;
+    signs[5] = z.get_dmax().sign;
+
+    return zone<mpq_class>::make(values, signs);
+}
+
 template <class T>
 struct earlier_bmin {
     inline bool operator() (const zone<T>& z1, const zone<T>& z2){
@@ -229,6 +250,19 @@ public:
     }
     void add_from_period_both_anchor(value_type begin, value_type end){
         add(zone_type::make_from_period_both_anchor(begin, end));
+    }
+
+    zone_set<mpq_class> get_as_rationals() const{
+        // Create an empty zone_set with rationals
+        zone_set<mpq_class> zsq;
+
+        if(std::is_same<double,T>::value){
+            for(auto it = this->cbegin(); it != this->cend(); it++){
+                zsq.add(get_rationals_zone_from_double_zone(*it));
+            }
+        }
+
+        return zsq;
     }
 
     // Note start: These functions add zones only for rationals. For other types nothing is added.
