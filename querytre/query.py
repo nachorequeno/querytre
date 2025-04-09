@@ -1,3 +1,5 @@
+from typing import Union
+
 from antlr4 import *
 from mpl_toolkits.axes_grid1.axes_size import Fraction
 
@@ -46,16 +48,17 @@ class QueryEvaluator(QueryVisitor):
     def __init__(self, df, dtype="int", **kwargs):
         self.df = df
         self.kwargs = kwargs
+        self.zoneset: Union[zoneset, zonesetf, zonesetq]
 
         if dtype == "int":
             self.dtype = int
-            self.zoneset = zoneset
+            self.zoneset = zoneset()
         elif dtype == "float":
             self.dtype = float
-            self.zoneset = zonesetf
+            self.zoneset = zonesetf()
         elif dtype == "rational":
             self.dtype = Fraction
-            self.zoneset = zonesetq
+            self.zoneset = zonesetq()
 
     # Visit a parse tree produced by QueryParser#Intersection.
     def visitIntersection(self, ctx: QueryParser.IntersectionContext):
@@ -132,7 +135,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Star.
     def visitStar(self, ctx: QueryParser.StarContext):
-        return self.zoneset.transitive_closure(ctx.child)
+        return self.zoneset.transitive_closure(self.visit(ctx.child))
 
     # Visit a parse tree produced by QueryParser#Complementation.
     def visitComplementation(self, ctx: QueryParser.ComplementationContext):
@@ -145,7 +148,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Plus.
     def visitPlus(self, ctx: QueryParser.PlusContext):
-        return self.zoneset.transitive_closure(ctx.child)
+        return self.zoneset.transitive_closure(self.visit(ctx.child))
 
     # Visit a parse tree produced by QueryParser#Plus.
     def visitDiamond(self, ctx: QueryParser.DiamondContext):
