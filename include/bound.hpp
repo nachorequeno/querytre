@@ -97,12 +97,12 @@ struct lower_bound : bound<T>{
      *  e.g. (x >= 3) includes (x > 3)
      */
     bool operator<(const lower_bound_type& other) const {
-        return (this->value < other.value) ||
+        return (this->value < other.value) or
                (this->value == other.value and this->sign > other.sign);
     }
 
     bool operator<(const upper_bound_type& other) const {
-        return (this->value < other.value) ||
+        return (this->value < other.value) or
                (this->value == other.value and this->sign > other.sign);
     }
 
@@ -111,14 +111,14 @@ struct lower_bound : bound<T>{
     }
 
     static bool includes (const lower_bound_type& b1, const lower_bound_type& b2){
-        return (b1.value < b2.value) ||
+        return (b1.value < b2.value) or
                (b1.value == b2.value and b1.sign >= b2.sign);
     }
 
 
 
     static lower_bound_type intersection (const lower_bound_type& b1, const lower_bound_type& b2){
-        if (b1.value < b2.value) ||
+        if (b1.value < b2.value) or
            (b1.value == b2.value and b1.sign >= b2.sign){
             return b2;
         } else {
