@@ -33,7 +33,9 @@ IDENTIFIER : [_a-zA-Z][_a-zA-Z0-9]*;
 
 LETTER : [_a-zA-Z];
 
-NUMBER: DIGIT | (DIGIT_NOT_ZERO DIGIT+);
+NUMBER: DIGIT | (DIGIT_NOT_ZERO DIGIT+) | FLOAT | RATIONAL;
+FLOAT: DIGIT+ '.' DIGIT+;
+RATIONAL: DIGIT+ '/' DIGIT+;
 
 WS         : [ \r\n\t]+ -> channel (HIDDEN);
 
