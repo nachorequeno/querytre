@@ -7,7 +7,7 @@ import sys
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\35")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\37")
         buf.write("P\4\2\t\2\4\3\t\3\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2")
         buf.write("\3\2\3\2\3\2\3\2\3\2\3\2\5\2\26\n\2\3\2\3\2\3\2\3\2\3")
         buf.write("\2\5\2\35\n\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2%\n\2\3\2\3\2")
@@ -60,7 +60,8 @@ class QueryParser ( Parser ):
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "IDENTIFIER", "LETTER", "NUMBER", "WS" ]
+                      "IDENTIFIER", "LETTER", "NUMBER", "FLOAT", "RATIONAL", 
+                      "WS" ]
 
     RULE_expr = 0
     RULE_idlist = 1
@@ -94,7 +95,9 @@ class QueryParser ( Parser ):
     IDENTIFIER=24
     LETTER=25
     NUMBER=26
-    WS=27
+    FLOAT=27
+    RATIONAL=28
+    WS=29
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -142,12 +145,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitIntersection" ):
                 listener.exitIntersection(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIntersection" ):
-                return visitor.visitIntersection(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class RiseAtomicContext(ExprContext):
 
@@ -166,12 +163,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRiseAtomic" ):
                 listener.exitRiseAtomic(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitRiseAtomic" ):
-                return visitor.visitRiseAtomic(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class FallAtomicContext(ExprContext):
@@ -192,12 +183,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitFallAtomic" ):
                 listener.exitFallAtomic(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFallAtomic" ):
-                return visitor.visitFallAtomic(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class TrueContext(ExprContext):
 
@@ -213,12 +198,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitTrue" ):
                 listener.exitTrue(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitTrue" ):
-                return visitor.visitTrue(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class AtomicContext(ExprContext):
@@ -238,12 +217,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAtomic" ):
                 listener.exitAtomic(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitAtomic" ):
-                return visitor.visitAtomic(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class DiamondContext(ExprContext):
@@ -267,12 +240,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitDiamond" ):
                 listener.exitDiamond(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDiamond" ):
-                return visitor.visitDiamond(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class BoxContext(ExprContext):
 
@@ -295,12 +262,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitBox" ):
                 listener.exitBox(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBox" ):
-                return visitor.visitBox(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class GroupingContext(ExprContext):
 
@@ -320,12 +281,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitGrouping" ):
                 listener.exitGrouping(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitGrouping" ):
-                return visitor.visitGrouping(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class DifferenceContext(ExprContext):
@@ -351,12 +306,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitDifference" ):
                 listener.exitDifference(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDifference" ):
-                return visitor.visitDifference(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class UnionContext(ExprContext):
 
@@ -380,12 +329,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitUnion" ):
                 listener.exitUnion(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnion" ):
-                return visitor.visitUnion(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class RestrictionContext(ExprContext):
@@ -414,12 +357,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitRestriction" ):
                 listener.exitRestriction(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitRestriction" ):
-                return visitor.visitRestriction(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class ConcatenationContext(ExprContext):
 
@@ -444,12 +381,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitConcatenation" ):
                 listener.exitConcatenation(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitConcatenation" ):
-                return visitor.visitConcatenation(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class StarContext(ExprContext):
 
@@ -470,12 +401,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitStar" ):
                 listener.exitStar(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitStar" ):
-                return visitor.visitStar(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class DualAtomicContext(ExprContext):
 
@@ -494,12 +419,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDualAtomic" ):
                 listener.exitDualAtomic(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDualAtomic" ):
-                return visitor.visitDualAtomic(self)
-            else:
-                return visitor.visitChildren(self)
 
 
     class ComplementationContext(ExprContext):
@@ -521,12 +440,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitComplementation" ):
                 listener.exitComplementation(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitComplementation" ):
-                return visitor.visitComplementation(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class QuestionContext(ExprContext):
 
@@ -547,12 +460,6 @@ class QueryParser ( Parser ):
             if hasattr( listener, "exitQuestion" ):
                 listener.exitQuestion(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitQuestion" ):
-                return visitor.visitQuestion(self)
-            else:
-                return visitor.visitChildren(self)
-
 
     class PlusContext(ExprContext):
 
@@ -572,12 +479,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPlus" ):
                 listener.exitPlus(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPlus" ):
-                return visitor.visitPlus(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -894,12 +795,6 @@ class QueryParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitIdlist" ):
                 listener.exitIdlist(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIdlist" ):
-                return visitor.visitIdlist(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
