@@ -1,4 +1,6 @@
 #include <pybind11/pybind11.h>
+#include <gmpxx.h>
+#include <gmp.h>
 
 #include "bound.hpp"
 #include "zone.hpp"
@@ -7,10 +9,10 @@
 
 namespace py = pybind11;
 
-using T = int64_t;
+using T = mpq_class;
 
-PYBIND11_MODULE(timedrel_ext_int, m) {
-    m.doc() = "timedrel integer plugin"; // optional module docstring
+PYBIND11_MODULE(timedrel_ext_rational, m) {
+    m.doc() = "timedrel rationals plugin"; // optional module docstring
 
     using namespace timedrel;
 
@@ -47,8 +49,8 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
         .def("dmax", &zone_type::get_dmax)
 
         .def<zone_type (*)(
-            const lower_bound_type&, const upper_bound_type&, 
-            const lower_bound_type&, const upper_bound_type&, 
+            const lower_bound_type&, const upper_bound_type&,
+            const lower_bound_type&, const upper_bound_type&,
             const lower_bound_type&, const upper_bound_type&)>
         ("make", &zone_type::make)
     ;
@@ -58,10 +60,15 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
         .def<void (zone_set_type::*)(const zone_type&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&)>("add", &zone_set_type::add)
         .def<void (zone_set_type::*)(const std::array<T, 6>&, const std::array<bool, 6>&)>("add", &zone_set_type::add)
+        .def("get_as_python_float", &zone_set_type::get_as_double) // Python float is C++ double
         .def("add_from_period", &zone_set_type::add_from_period)
         .def("add_from_period_rise_anchor", &zone_set_type::add_from_period_rise_anchor)
         .def("add_from_period_fall_anchor", &zone_set_type::add_from_period_fall_anchor)
         .def("add_from_period_both_anchor", &zone_set_type::add_from_period_both_anchor)
+        .def("add_from_period_string", &zone_set_type::add_from_period_string)
+        .def("add_from_period_rise_anchor_string", &zone_set_type::add_from_period_rise_anchor_string)
+        .def("add_from_period_fall_anchor_string", &zone_set_type::add_from_period_fall_anchor_string)
+        .def("add_from_period_both_anchor_string", &zone_set_type::add_from_period_both_anchor_string)
         .def("empty", &zone_set_type::empty)
         .def("__iter__", [](const zone_set_type &s) { return py::make_iterator(s.cbegin(), s.cend()); },
                          py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
@@ -73,7 +80,7 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
 
     // Set operations
     m.def<zone_set_type (*)(const zone_set_type&)>("complementation", &zone_set_type::complementation);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("duration_restriction", &zone_set_type::duration_restriction);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string &, const std::string &)>("duration_restriction", &zone_set_type::duration_restriction_string);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("union", &zone_set_type::set_union);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("intersection", &zone_set_type::intersection);
     m.def<zone_set_type (*)(const zone_set_type&, const zone_set_type&)>("difference", &zone_set_type::set_difference);
@@ -83,16 +90,16 @@ PYBIND11_MODULE(timedrel_ext_int, m) {
     m.def<zone_set_type (*)(const zone_set_type&)>("transitive_closure", &zone_set_type::transitive_closure);
 
     // Modal operations of the logic of time periods
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_starts", &zone_set_type::diamond_starts);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_started_by", &zone_set_type::diamond_started_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_finishes", &zone_set_type::diamond_finishes);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_finished_by", &zone_set_type::diamond_finished_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_meets", &zone_set_type::diamond_meets);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("diamond_met_by", &zone_set_type::diamond_met_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_starts", &zone_set_type::box_starts);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_started_by", &zone_set_type::box_started_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_finishes", &zone_set_type::box_finishes);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_finished_by", &zone_set_type::box_finished_by);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_meets", &zone_set_type::box_meets);
-    m.def<zone_set_type (*)(const zone_set_type&, T, T)>("box_met_by", &zone_set_type::box_met_by);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_starts", &zone_set_type::diamond_starts_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_started_by", &zone_set_type::diamond_started_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_finishes", &zone_set_type::diamond_finishes_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_finished_by", &zone_set_type::diamond_finished_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_meets", &zone_set_type::diamond_meets_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("diamond_met_by", &zone_set_type::diamond_met_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_starts", &zone_set_type::box_starts_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_started_by", &zone_set_type::box_started_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_finishes", &zone_set_type::box_finishes_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_finished_by", &zone_set_type::box_finished_by_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_meets", &zone_set_type::box_meets_string);
+    m.def<zone_set_type (*)(const zone_set_type&, const std::string&, const std::string&)>("box_met_by", &zone_set_type::box_met_by_string);
 }

@@ -1,5 +1,7 @@
 #include <limits>
 #include <iostream>
+#include <type_traits>
+#include <gmpxx.h>
 
 #ifndef TIMEDREL_BOUND_HPP
 #define TIMEDREL_BOUND_HPP
@@ -31,14 +33,19 @@ friend std::ostream& operator<<(std::ostream &os, const bound<T1>&);
      * The max is divided by 2 to prevent overflow since we currently 
      * need to add two numbers in several operations.
      */
-     /* TODO: infinity, minus_infinity and zero might be buggy depending on the T datatype.
-     They only work for int and rational, and might fail for float/doubles (Kleene+). The fix consists on
-     detecting the type T when casting, and raising an error.*/
-    constexpr static T infinity = (std::numeric_limits<T>::has_infinity) ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max()/2;
-    constexpr static T minus_infinity = (std::numeric_limits<T>::has_infinity) ? std::numeric_limits<T>::infinity() : -std::numeric_limits<T>::max()/2;
+    static T infinity(){
+        return (std::numeric_limits<T>::has_infinity) ?
+        std::numeric_limits<T>::infinity() :
+        std::numeric_limits<T>::max()/2;
+    }
+    static T minus_infinity(){
+        return (std::numeric_limits<T>::has_infinity) ?
+        std::numeric_limits<T>::infinity() :
+        -std::numeric_limits<T>::max()/2;
+    }
 
     
-    constexpr static T zero = 0;
+    static const auto zero = 0;
 
     bound(T v, bool p){
         value = v;
@@ -50,27 +57,27 @@ friend std::ostream& operator<<(std::ostream &os, const bound<T1>&);
     }
 
     bool operator<(const bound_type& other) const {
-        if(this->value < other.value){
-            return true;
-        } else if (this->value == other.value and this->sign < other.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (this->value < other.value) ||
+               (this->value == other.value and this->sign < other.sign);
     }
 
     static bool is_valid_interval(const lower_bound_type& l, const upper_bound_type& u){
 
-        if (l.value < u.value) {
-            return true;
-        } else if (l.value == u.value and l.sign and u.sign) {
-            return true;
-        } else {
-            return false;
-        }
+        return (l.value < u.value) ||
+               (l.value == u.value and l.sign and u.sign);
     }
 
 };
+
+template <>
+mpq_class bound<mpq_class>::infinity(){
+    return mpq_class(std::numeric_limits<double>::max());
+}
+
+template <>
+mpq_class bound<mpq_class>::minus_infinity(){
+    return mpq_class(-std::numeric_limits<double>::max());
+}
 
 template <class T>
 struct lower_bound : bound<T>{
@@ -90,23 +97,13 @@ struct lower_bound : bound<T>{
      *  e.g. (x >= 3) includes (x > 3)
      */
     bool operator<(const lower_bound_type& other) const {
-        if(this->value < other.value){
-            return true;
-        } else if (this->value == other.value and this->sign > other.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (this->value < other.value) ||
+               (this->value == other.value and this->sign > other.sign);
     }
 
     bool operator<(const upper_bound_type& other) const {
-        if(this->value < other.value){
-            return true;
-        } else if (this->value == other.value and this->sign > other.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (this->value < other.value) ||
+               (this->value == other.value and this->sign > other.sign);
     }
 
     upper_bound_type complement(){
@@ -114,21 +111,15 @@ struct lower_bound : bound<T>{
     }
 
     static bool includes (const lower_bound_type& b1, const lower_bound_type& b2){
-        if(b1.value < b2.value){
-            return true;
-        } else if (b1.value == b2.value and b1.sign >= b2.sign){
-            return true;
-        } else {
-            return false;
-        }   
+        return (b1.value < b2.value) ||
+               (b1.value == b2.value and b1.sign >= b2.sign);
     }
 
 
 
     static lower_bound_type intersection (const lower_bound_type& b1, const lower_bound_type& b2){
-        if(b1.value < b2.value){
-            return b2;
-        } else if (b1.value == b2.value and b1.sign >= b2.sign){
+        if (b1.value < b2.value) ||
+           (b1.value == b2.value and b1.sign >= b2.sign){
             return b2;
         } else {
             return b1;
@@ -156,7 +147,7 @@ struct lower_bound : bound<T>{
     static lower_bound_type open(T v){ return lower_bound_type(v, false);}
     static lower_bound_type closed(T v){ return lower_bound_type(v, true);}
 
-    static lower_bound_type unbounded(){ return lower_bound_type(type::minus_infinity, false);}
+    static lower_bound_type unbounded(){ return lower_bound_type(type::minus_infinity(), false);}
 
 };
 
@@ -175,23 +166,13 @@ struct upper_bound : public bound<T> {
      *  Sorting order
      */
     bool operator<(const upper_bound_type& other) const {
-        if(this->value < other.value){
-            return true;
-        } else if (this->value == other.value and this->sign < other.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (this->value < other.value) ||
+               (this->value == other.value and this->sign < other.sign);
     }
 
     bool operator<(const lower_bound_type& other) const {
-        if(this->value < other.value){
-            return true;
-        } else if (this->value == other.value and this->sign < other.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (this->value < other.value) ||
+               (this->value == other.value and this->sign < other.sign);
     }
 
     lower_bound_type complement(){
@@ -205,19 +186,13 @@ struct upper_bound : public bound<T> {
      *  e.g. (x >= 3) includes (x > 3)
      */
     static bool includes (const upper_bound_type& b1, const upper_bound_type& b2){
-        if(b1.value > b2.value){
-            return true;
-        } else if (b1.value == b2.value and b1.sign >= b2.sign){
-            return true;
-        } else {
-            return false;
-        }
+        return (b1.value > b2.value) ||
+               (b1.value == b2.value and b1.sign >= b2.sign);
     }
 
     static upper_bound_type intersection (const upper_bound_type& b1, const upper_bound_type& b2){
-        if(b1.value > b2.value){
-            return b2;
-        } else if (b1.value == b2.value and b1.sign >= b2.sign){
+        if (b1.value > b2.value) ||
+           (b1.value == b2.value and b1.sign >= b2.sign){
             return b2;
         } else {
             return b1;
@@ -244,7 +219,7 @@ struct upper_bound : public bound<T> {
     static upper_bound_type open(T v){ return upper_bound_type(v, false);}
     static upper_bound_type closed(T v){ return upper_bound_type(v, true);}
 
-    static upper_bound_type unbounded(){ return upper_bound_type(type::infinity, false);}
+    static upper_bound_type unbounded(){ return upper_bound_type(type::infinity(), false);}
 
 };
 

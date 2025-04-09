@@ -1,5 +1,14 @@
 import timedrel.timedrel_ext_float as ext
 
+import matplotlib.pyplot as plt
+
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+
+import io
+
+from PIL import Image
+
 class zoneset(object):
     """docstring for zoneset"""
     def __init__(self, data=None):
@@ -56,6 +65,10 @@ class zoneset(object):
 
     def empty(self):
         return self.container.empty()
+
+    def get_as_rationals(self):
+        from .zonesetq import zoneset as zonesetq
+        return zonesetq(self.container.get_as_rationals())
 
     @classmethod
     def from_periods(cls, periods, anchor=None):
@@ -182,5 +195,156 @@ class zoneset(object):
             raise ValueError("Unknown relation")
         
     def __str__(self):
-        return "\n".join([str(zone) for zone in self.container])
+        return str(self.container)
 
+    def __repr__(self):
+        return f"zonesetf({str(self.container)})"
+
+    def plot_zones(self, fig: Figure = None) -> Axes:
+        '''
+        Function to plot zones
+        '''
+        def get_values(zone) -> tuple[int, ...]:
+            bminv = zone.bmin().value
+            bmaxv = zone.bmax().value
+            eminv = zone.emin().value
+            emaxv = zone.emax().value
+            dminv = zone.dmin().value
+            dmaxv = zone.dmax().value
+            return (bminv, bmaxv, eminv, emaxv, dminv, dmaxv)
+
+        def get_signs(zone) -> tuple[bool, ...]:
+            bmins = zone.bmin().sign
+            bmaxs = zone.bmax().sign
+            emins = zone.emin().sign
+            emaxs = zone.emax().sign
+            dmins = zone.dmin().sign
+            dmaxs = zone.dmax().sign
+            return (bmins, bmaxs, emins, emaxs, dmins, dmaxs)
+
+        def draw_lines(b: float, bp: float, e: float, ep: float, d: float, dp: float, formatos: tuple[int, ...],
+                    ax: Axes) -> None:
+
+            # In montre, 0 means strict (b < t), and 1 means not strict (b <= t)
+            # Line styles: '--' == 'dashed, '--' == 'solid'
+            # line_styles = {0: '--', 1: '-'}
+            line_styles = {0: 'dashed', 1: 'solid'}
+            styles = [line_styles[fmt] for fmt in formatos]
+
+            xmin, xmax = ax.get_xlim()
+            ymin, ymax = ax.get_ylim()
+
+            # Diagonals
+            # dp_line = [b + dp, bp + dp]  # Top diagonal
+            # d_line = [b + d, bp + d]  # Bottom diagonal
+            # x = [b, bp]
+
+            x = [xmin, xmax]
+            dp_line = [x[0] + dp, x[1] + dp]  # Top diagonal
+            d_line = [x[0] + d, x[1] + d]  # Bottom diagonal
+
+            ax.plot(x, d_line, color='b', linestyle=styles[4])
+            ax.plot(x, dp_line, color='b', linestyle=styles[5])
+
+            # Vertical lines
+            #ax.vlines(x=b, ymin=min(e, d_line[0]), ymax=max(ep, dp_line[1]), color='r', linestyle=styles[0])
+            #ax.vlines(x=bp, ymin=min(e, d_line[0]), ymax=max(ep, dp_line[1]), color='r', linestyle=styles[1])
+
+            ax.vlines(x=b, ymin=ymin, ymax=ymax, color='g', linestyle=styles[0])
+            ax.vlines(x=bp, ymin=ymin, ymax=ymax, color='g', linestyle=styles[1])
+
+            # Horizontal lines
+            # ax.hlines(y=e, xmin=b, xmax=bp, color='g', linestyle=styles[2])
+            # ax.hlines(y=ep, xmin=b, xmax=bp, color='g', linestyle=styles[3])
+
+            ax.hlines(y=e, xmin=xmin, xmax=xmax, color='r', linestyle=styles[2])
+            ax.hlines(y=ep, xmin=xmin, xmax=xmax, color='r', linestyle=styles[3])
+
+            # Set axis limits
+            # plt.xlim(0, bp + dp)
+            # plt.ylim(0, bp + dp)
+
+        def fill_polygon(b: float, bp: float, e: float, ep: float, d: float, dp: float, ax: Axes) -> None:
+
+            # Polygon has, as maximum, six points.
+            # Polygon points:
+            p1 = (b, e)
+            p2 = (b, b + dp)
+            p3 = (ep - dp, ep)
+            p4 = (bp, ep)
+            p5 = (bp, bp + d)
+            p6 = (e - d, e)
+
+            # Set of points. Sets are used in order to prevent duplicated points
+            lp = [p1, p2, p3, p4, p5, p6]
+
+            xs = [x[0] for x in lp]
+            ys = [x[1] for x in lp]
+
+            ax.fill(xs, ys, color='grey')
+
+        def plot_2D(values, signs, fig: Figure = None) -> Axes:
+            if fig is None:
+                fig = plt.figure()
+
+            ax_list = fig.axes
+            if ax_list is None or len(ax_list) == 0:
+                ax = fig.add_subplot(111)
+            else:
+                ax = ax_list[0]
+
+            b, bp, e, ep, d, dp = values
+            formats = (int(signs[0]), int(signs[1]), int(signs[2]), int(signs[3]), int(signs[4]), int(signs[5]))
+
+            draw_lines(b, bp, e, ep, d, dp, formats, ax)
+            fill_polygon(b, bp, e, ep, d, dp, ax)
+
+            return ax
+
+        if fig is None:
+            fig = plt.figure()
+
+        ax_list = fig.axes
+        if ax_list is None or len(ax_list) == 0:
+            ax = fig.add_subplot(111)
+        else:
+            ax = ax_list[0]
+
+        zones = self.container
+
+        min_bs = (get_values(zone)[0] for zone in zones)
+        max_bs = (get_values(zone)[1] for zone in zones)
+        min_es = (get_values(zone)[2] for zone in zones)
+        max_es = (get_values(zone)[3] for zone in zones)
+
+        min_x, max_x = min(min_bs), max(max_bs)
+        min_y, max_y = min(min_es), max(max_es)
+        ax.set_xlim((0, max_x)) # min_x
+        ax.set_ylim((0, max_y)) # min_y
+
+        for zone in zones:
+            plot_2D(get_values(zone), get_signs(zone), fig=fig)
+
+        return ax
+
+    def display(self):
+        # Crear el gráfico y dibujar las zonas
+        fig, ax = plt.subplots()
+        self.plot_zones(fig)
+
+        # Mostrar el gráfico
+        plt.show()
+
+    def get_image(self):
+        # Crear el gráfico y dibujar las zonas
+        fig, ax = plt.subplots()
+        self.plot_zones(fig)
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+
+        # Open the image using Pillow
+        image = Image.open(buf)
+
+        return image

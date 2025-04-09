@@ -1,4 +1,4 @@
-import timedrel.timedrel_ext_int as ext
+import timedrel.timedrel_ext_rational as ext
 
 import matplotlib.pyplot as plt
 
@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 import io
 
 from PIL import Image
+
+# [TODO] Decide if we want to use overloading of getitem for duration restriction and modal operations
 
 class zoneset(object):
     """docstring for zoneset"""
@@ -42,6 +44,7 @@ class zoneset(object):
     def __eq__(self, other):
         return zoneset.includes(self, other) and zoneset.includes(other, self)
 
+    # [TODO] We cannot directly pass rationals from Python to C++
     def add(self, bmin, bmax, emin, emax, dmin, dmax):
         self.container.add(ext.zone.make(ext.geq(bmin), ext.lt(bmax),ext.gt(emin), ext.leq(emax), ext.gt(dmin), ext.leq(dmax)))
 
@@ -57,11 +60,19 @@ class zoneset(object):
     def concatenate(self, other):
         return zoneset.concatenation(self, other)
 
+    def includes(self, other):
+        return ext.includes(self.container, other.container)
+
     def iterate(self):
         return zoneset.transitive_closure(self)
 
     def empty(self):
         return self.container.empty()
+
+    # Python default float is C++ double
+    def get_as_float(self):
+        from .zonesetf import zoneset as zonesetf
+        return zonesetf(self.container.get_as_python_float())
 
     @classmethod
     def from_periods(cls, periods, anchor=None):
@@ -69,15 +80,15 @@ class zoneset(object):
         zset = zoneset()
 
         if anchor == None:
-            func = zset.container.add_from_period
+            func = zset.container.add_from_period_string
         elif anchor == "rise":
-            func = zset.container.add_from_period_rise_anchor
+            func = zset.container.add_from_period_rise_anchor_string
         elif anchor == "fall":
-            func = zset.container.add_from_period_fall_anchor
+            func = zset.container.add_from_period_fall_anchor_string
         elif anchor == "both":
-            func = zset.container.add_from_period_both_anchor
+            func = zset.container.add_from_period_both_anchor_string
         elif anchor == "none":
-            func = zset.container.add_from_period_both_anchor
+            func = zset.container.add_from_period_both_anchor_string
         else:
             raise Exception(r"Unknown anchor: Options are {none, rise, fall, both}")
 
@@ -104,9 +115,9 @@ class zoneset(object):
             for ts in _collect(df, predicate):
                 if value:
                     end = ts
-                    yield (begin, end)          
+                    yield (begin, end)
                 else:
-                    begin = ts 
+                    begin = ts
                 value = not value
 
         return cls.from_periods(collect(df, predicate), anchor)
@@ -129,6 +140,8 @@ class zoneset(object):
 
         return zoneset(result)
 
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def duration_restriction(cls, zset, lower, upper):
         return zoneset(ext.duration_restriction(zset.container, lower, upper))
@@ -153,6 +166,8 @@ class zoneset(object):
     def transitive_closure(cls, zset):
         return zoneset(ext.transitive_closure(zset.container))
 
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def modal_diamond(cls, zset, relation, lower, upper):
         if relation == "meets" or relation == "A":
@@ -170,6 +185,8 @@ class zoneset(object):
         else:
             raise ValueError("Unknown relation")
 
+    # We cannot directly pass lower and upper bounds as rationals
+    # Pass them as strings of form "1/2" or "1/10"
     @classmethod
     def modal_box(cls, zset, relation, lower, upper):
         if relation == "meets" or relation == "A":
@@ -186,13 +203,14 @@ class zoneset(object):
             return zoneset(ext.box_finished_by(zset.container, lower, upper))
         else:
             raise ValueError("Unknown relation")
-        
+
     def __str__(self):
         return str(self.container)
 
     def __repr__(self):
-        return f"zoneset({str(self.container)})"
+        return f"zonesetq({str(self.container)})"
 
+    # [TODO] Cannot directly pass lower and upper bounds as rationals
     def plot_zones(self, fig: Figure = None) -> Axes:
         '''
         Function to plot zones

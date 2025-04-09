@@ -3,6 +3,7 @@
 #include <limits>
 #include <cstdint>
 #include <iostream>
+#include <sstream>
 
 #include "bound.hpp"
 
@@ -47,8 +48,10 @@ private:
 
 public:
 
-    constexpr static T infinity = bound_type::infinity; 
-    constexpr static T zero = bound_type::zero;
+    static T infinity(){
+        return bound_type::infinity();
+    }
+    static const auto zero = bound_type::zero;
 
     bool operator==(const zone_type& other) const {
         return get_bmin() == other.get_bmin() and 
@@ -270,6 +273,13 @@ public:
     }
 
 };
+
+template <typename T>
+inline std::string toString(const zone<T>& z) {
+    std::ostringstream ss;
+    ss << z;
+    return ss.str();
+}
 
 } // namespace timedrel
 

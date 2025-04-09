@@ -1,11 +1,14 @@
+from typing import Union
+
 from antlr4 import *
+from mpl_toolkits.axes_grid1.axes_size import Fraction
 
 from querytre.parser.QueryLexer import QueryLexer
 from querytre.parser.QueryParser import QueryParser
 from querytre.parser.QueryVisitor import QueryVisitor
 
 # import intervals
-from querytre import zoneset, zonesetf
+from querytre import zoneset, zonesetf, zonesetq
 
 
 def eval(df, expr, timescale=1, projection=None, dtype="int", **kwargs):
@@ -45,13 +48,17 @@ class QueryEvaluator(QueryVisitor):
     def __init__(self, df, dtype="int", **kwargs):
         self.df = df
         self.kwargs = kwargs
+        self.zoneset: Union[zoneset, zonesetf, zonesetq]
 
         if dtype == "int":
             self.dtype = int
-            self.zoneset = zoneset
+            self.zoneset = zoneset()
         elif dtype == "float":
             self.dtype = float
-            self.zoneset = zonesetf
+            self.zoneset = zonesetf()
+        elif dtype == "rational":
+            self.dtype = Fraction
+            self.zoneset = zonesetq()
 
     # Visit a parse tree produced by QueryParser#Intersection.
     def visitIntersection(self, ctx: QueryParser.IntersectionContext):
@@ -128,7 +135,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Star.
     def visitStar(self, ctx: QueryParser.StarContext):
-        return self.zoneset.transitive_closure(child)
+        return self.zoneset.transitive_closure(self.visit(ctx.child))
 
     # Visit a parse tree produced by QueryParser#Complementation.
     def visitComplementation(self, ctx: QueryParser.ComplementationContext):
@@ -141,7 +148,7 @@ class QueryEvaluator(QueryVisitor):
 
     # Visit a parse tree produced by QueryParser#Plus.
     def visitPlus(self, ctx: QueryParser.PlusContext):
-        return self.zoneset.transitive_closure(child)
+        return self.zoneset.transitive_closure(self.visit(ctx.child))
 
     # Visit a parse tree produced by QueryParser#Plus.
     def visitDiamond(self, ctx: QueryParser.DiamondContext):
@@ -149,14 +156,14 @@ class QueryEvaluator(QueryVisitor):
         lbound = self.dtype(ctx.l.text) * self.kwargs['timescale']
         ubound = self.dtype(ctx.u.text) * self.kwargs['timescale']
 
-        return self.zoneset.modal_diamond(child, relation, lbound, ubound)
+        return self.zoneset.modal_diamond(ctx.child, relation, lbound, ubound)
 
     def visitBox(self, ctx: QueryParser.BoxContext):
         relation = ctx.relation.text
         lbound = self.dtype(ctx.l.text) * self.kwargs['timescale']
         ubound = self.dtype(ctx.u.text) * self.kwargs['timescale']
 
-        return self.zoneset.modal_box(child, relation, lbound, ubound)
+        return self.zoneset.modal_box(ctx.child, relation, lbound, ubound)
 
     def collect(self, df, predicate):
 
