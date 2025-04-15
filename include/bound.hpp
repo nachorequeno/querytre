@@ -97,12 +97,12 @@ struct lower_bound : bound<T>{
      *  e.g. (x >= 3) includes (x > 3)
      */
     bool operator<(const lower_bound_type& other) const {
-        return (this->value < other.value) or
+        return (this->value < other.value) ||
                (this->value == other.value and this->sign > other.sign);
     }
 
     bool operator<(const upper_bound_type& other) const {
-        return (this->value < other.value) or
+        return (this->value < other.value) ||
                (this->value == other.value and this->sign > other.sign);
     }
 
@@ -111,15 +111,15 @@ struct lower_bound : bound<T>{
     }
 
     static bool includes (const lower_bound_type& b1, const lower_bound_type& b2){
-        return (b1.value < b2.value) or
-               (b1.value == b2.value and b1.sign >= b2.sign);
+        return (b1.value < b2.value) ||
+               (b1.value == b2.value && b1.sign >= b2.sign);
     }
 
 
 
     static lower_bound_type intersection (const lower_bound_type& b1, const lower_bound_type& b2){
-        if (b1.value < b2.value) or
-           (b1.value == b2.value and b1.sign >= b2.sign){
+        if ((b1.value < b2.value) ||
+            (b1.value == b2.value and b1.sign >= b2.sign)){
             return b2;
         } else {
             return b1;
@@ -167,12 +167,12 @@ struct upper_bound : public bound<T> {
      */
     bool operator<(const upper_bound_type& other) const {
         return (this->value < other.value) ||
-               (this->value == other.value and this->sign < other.sign);
+               (this->value == other.value && this->sign < other.sign);
     }
 
     bool operator<(const lower_bound_type& other) const {
         return (this->value < other.value) ||
-               (this->value == other.value and this->sign < other.sign);
+               (this->value == other.value && this->sign < other.sign);
     }
 
     lower_bound_type complement(){
@@ -187,12 +187,12 @@ struct upper_bound : public bound<T> {
      */
     static bool includes (const upper_bound_type& b1, const upper_bound_type& b2){
         return (b1.value > b2.value) ||
-               (b1.value == b2.value and b1.sign >= b2.sign);
+               (b1.value == b2.value && b1.sign >= b2.sign);
     }
 
     static upper_bound_type intersection (const upper_bound_type& b1, const upper_bound_type& b2){
-        if (b1.value > b2.value) ||
-           (b1.value == b2.value and b1.sign >= b2.sign){
+        if ((b1.value > b2.value) ||
+           (b1.value == b2.value && b1.sign >= b2.sign)){
             return b2;
         } else {
             return b1;
