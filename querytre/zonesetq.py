@@ -74,6 +74,9 @@ class zoneset(object):
         from .zonesetf import zoneset as zonesetf
         return zonesetf(self.container.get_as_python_float())
 
+    def time_robustness_translation(self, t, tp, s, e):
+        return ext.time_robustness_translation(self.container, t, tp, s, e)
+
     @classmethod
     def from_periods(cls, periods, anchor=None):
 

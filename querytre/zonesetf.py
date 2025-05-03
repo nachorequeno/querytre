@@ -70,6 +70,9 @@ class zoneset(object):
         from .zonesetq import zoneset as zonesetq
         return zonesetq(self.container.get_as_rationals())
 
+    def time_robustness_translation(self, t, tp, s, e):
+        return ext.time_robustness_translation(self.container, t, tp, s, e)
+
     @classmethod
     def from_periods(cls, periods, anchor=None):
 
