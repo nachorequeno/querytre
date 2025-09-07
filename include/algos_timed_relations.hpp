@@ -8,13 +8,13 @@
 
 namespace timedrel {
 
-struct earlier_bmin {
+struct gen_earlier_bmin {
     inline bool operator() (std::shared_ptr<gen_zone> &z1, std::shared_ptr<gen_zone> &z2){
         return z1->compare_less_bmin(z2);
     }
 };
 
-struct earlier_emin {
+struct gen_earlier_emin {
     inline bool operator() (std::shared_ptr<gen_zone> &z1, std::shared_ptr<gen_zone> &z2){
         return z1->compare_less_emin(z2);
     }
@@ -51,7 +51,7 @@ static std::vector<std::shared_ptr<gen_zone>> gen_filter(const std::vector<std::
         result.push_back(z2->clone());
     }
 
-    std::sort(result.begin(), result.end(), earlier_bmin());
+    std::sort(result.begin(), result.end(), gen_earlier_bmin());
 
     return result;
 }
@@ -257,7 +257,7 @@ static std::vector<std::shared_ptr<gen_zone>> gen_intersection(const std::vector
         result.push_back(zr->clone());
     }
 
-    std::sort(result.begin(), result.end(), earlier_bmin());
+    std::sort(result.begin(), result.end(), gen_earlier_bmin());
     return result;
 }
 
@@ -275,7 +275,7 @@ static std::vector<std::shared_ptr<gen_zone>> gen_concatenation(const std::vecto
         zs1.push_back(zs1t->clone());
     }    
 
-    std::sort(zs1.begin(), zs1.end(), earlier_emin());
+    std::sort(zs1.begin(), zs1.end(), gen_earlier_emin());
     // std::sort(zs2.begin(), zs2.end(), earlier_bmin<value_type>());
 
     auto it1 = zs1.cbegin();
@@ -417,7 +417,7 @@ static std::vector<std::shared_ptr<gen_zone>> gen_concatenation(const std::vecto
         result.push_back(zr->clone());
     }
 
-    std::sort(result.begin(), result.end(), earlier_bmin());
+    std::sort(result.begin(), result.end(), gen_earlier_bmin());
     return result;
 }
 
