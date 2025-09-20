@@ -28,12 +28,30 @@ public:
     // Constructor
     dgzone_set(zone_type &zvec, std::string notation): zvec(zvec), notation(notation){}
 
+    dgzone_set(const timedrel::zone_set<T> &zs, std::string notation){
+        this->notation = notation;
+
+        int i = 0;
+        for(auto it=zs.cbegin(); it!=zs.cend(); it++){
+            std::vector<int> empty_chids;
+            auto indexed_zone_ptr = std::make_shared<indexed_zone<T>>(*it, i, std::vector<int>());
+            (this->zvec).push_back(indexed_zone_ptr);
+            i++;
+        }
+    }
+
     std::string get_notation(){
         return this->notation;
     }
 
     std::vector<std::shared_ptr<zone_type>> get_zvec(){
         return this->zvec;
+    }
+
+    std::shared_ptr<zone_type> get_indexed_zone_ptr_at_index(int i){
+        int zone_vec_size = (this->zvec).size();
+        assertm( (i >= 0) and (i < zone_vec_size), "Zone index out of bounds!");
+        return this->zvec[i];
     }
 
     // Helper function to replicate zvec
@@ -165,6 +183,46 @@ public:
         return dgzone_set<T>(zvec_res, notation);
     }
     
+    static std::vector<std::pair<T,T>> infer_concatenation(dgzone_set<T> &dgres, int index, 
+                dgzone_set<T> &dg1, dgzone_set<T> &dg2,
+                std::pair<T,T> &time_interval){
+        auto zres_ptr = dgres.get_indexed_zone_ptr_at_index(index);
+        auto zres = zres_ptr->get_myzone();
+        auto chids = zres_ptr->get_chids();
+        assertm((chids.size() == 2), "Concatenation needs to have exactly two children zones");
+        int chid1 = chids[0];
+        int chid2 = chids[1];
+
+        auto z1_ptr = dg1.get_indexed_zone_ptr_at_index(chid1);
+        auto z1 = z1_ptr->get_myzone();
+
+        auto z2_ptr = dg2.get_indexed_zone_ptr_at_index(chid2);
+        auto z2 = z2_ptr->get_myzone();
+
+        T interim_time_point =  timedrel::infer_seq_comp(zres, z1, z2, time_interval);
+
+        std::vector<std::pair<T,T>> split_time_intervals;
+        split_time_intervals.push_back(std::make_pair(time_interval.first, interim_time_point));
+        split_time_intervals.push_back(std::make_pair(interim_time_point, time_interval.second));
+
+        return split_time_intervals;
+    }
+
+    static std::vector<std::pair<T,T>> infer_kleene_plus(dgzone_set<T> &dgres, int index, dgzone_set<T> &dg1,
+            std::pair<T,T> &time_interval){
+        auto zres_ptr = dgres.get_indexed_zone_ptr_at_index(index);
+        auto zres = zres_ptr->get_myzone();
+        auto chids = zres_ptr->get_chids();
+
+        std::vector<timedrel::zone<T>> ch_zone_list;
+        for(int i = 0; i < chids.size(); i++){
+            auto z1_ptr = dg1.get_indexed_zone_ptr_at_index(chids[i]);
+            auto z1 = z1_ptr->get_myzone();
+            ch_zone_list.push_back(z1);
+        }
+
+        return infer_mult_seq_comp(zres, ch_zone_list, time_interval);
+    }
 };
 
 
