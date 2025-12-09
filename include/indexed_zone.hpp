@@ -109,18 +109,18 @@ class indexed_zone: public gen_zone{
 template <class T>
 inline std::ostream& operator<<(
     std::ostream &os, const indexed_zone<T> &z){
-	std::cout<<"("<<z.get_myzone()<<")-->";
-	std::cout<<"("<<z.get_myid()<<")-->(";
+	os<<"("<<z.get_myzone()<<")-->";
+	os<<"("<<z.get_myid()<<")-->(";
     std::vector<int> chvec = z.get_chids();
     for(int i=0; i < chvec.size(); i++){
         if(not (i == (chvec.size()-1) ) ){
-            std::cout<<chvec[i]<<",";    
+            os<<chvec[i]<<",";    
         }else{
-            std::cout<<chvec[i];
+            os<<chvec[i];
         }
         
     }
-    std::cout<<")";
+    os<<")";
     return os;
 }
 
@@ -346,7 +346,7 @@ std::vector<std::pair<T,T>> infer_mult_seq_comp(const timedrel::zone<T> &res,
     }
 
     // Populate accumulation vector
-    auto temp_acc = zlist[1];
+    auto temp_acc = zlist[0];
     for(int i = 0; i < zlist.size(); i++){
         if(i == 0){
             seq_comp_acc[i] = temp_acc;

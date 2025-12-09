@@ -26,8 +26,6 @@ class dgzone_set{
 
 public:
     // Constructor
-    dgzone_set(zone_type &zvec, std::string notation): zvec(zvec), notation(notation){}
-
     dgzone_set(const timedrel::zone_set<T> &zs, std::string notation){
         this->notation = notation;
 
@@ -40,11 +38,16 @@ public:
         }
     }
 
-    std::string get_notation(){
+    dgzone_set(const std::vector<std::shared_ptr<zone_type>> &zvec, std::string &notation){
+        this->zvec = zvec;
+        this->notation = notation;
+    }
+
+    std::string get_notation() const{
         return this->notation;
     }
 
-    std::vector<std::shared_ptr<zone_type>> get_zvec(){
+    std::vector<std::shared_ptr<zone_type>> get_zvec() const{
         return this->zvec;
     }
 
@@ -55,8 +58,8 @@ public:
     }
 
     // Helper function to replicate zvec
-    std::vector<std::shared_ptr<gen_zone>> replicate(std::vector<std::shared_ptr<zone_type>> &zvec){
-        std::vector<std::shared_ptr<zone_type>> zvec_res;
+    static std::vector<std::shared_ptr<gen_zone>> replicate(const std::vector<std::shared_ptr<zone_type>> &zvec){
+        std::vector<std::shared_ptr<gen_zone>> zvec_res;
 
         for(int i=0; i < zvec.size(); i++){
             auto clone_ptr = zvec[i]->clone();
@@ -70,10 +73,10 @@ public:
     }
 
     // Helper function to get indexed zone from generic zone
-    std::vector<std::shared_ptr<zone_type>> convert_to_indexed_zone(std::vector<std::shared_ptr<gen_zone>> &zvec){
-        std::vector<zone_type> zvec_res;
+    static std::vector<std::shared_ptr<zone_type>> convert_to_indexed_zone(const std::vector<std::shared_ptr<gen_zone>> &zvec){
+        std::vector<std::shared_ptr<zone_type>> zvec_res;
         for(int i = 0; i < zvec.size(); i++){
-            zone_type zone_type_ptr = 
+            std::shared_ptr<zone_type> zone_type_ptr = 
                     std::dynamic_pointer_cast<zone_type>(zvec[i]);
             zone_type_ptr->set_myid(i);
             zvec_res.push_back(zone_type_ptr);
@@ -82,7 +85,7 @@ public:
     }
 
     static dgzone_set<T> concatenation(const dgzone_set<T> &dgzs1, const dgzone_set<T> &dgzs2){
-        auto notation = dgzs1.get_notation() + symbols.at(op_type::concat) + dgzs2.get_notation();
+        auto notation = "("+dgzs1.get_notation() + symbols.at(op_type::concat) + dgzs2.get_notation()+")";
         auto zvec1 = replicate(dgzs1.get_zvec());
         auto zvec2 = replicate(dgzs2.get_zvec());
 
@@ -94,7 +97,7 @@ public:
     }
 
     static dgzone_set<T> kleene_plus(const dgzone_set<T> &dgzs1){
-        auto notation = dgzs1.get_notation() + symbols.at(op_type::kplus);
+        auto notation = "("+dgzs1.get_notation() + symbols.at(op_type::kplus)+")";
         auto zvec1 = replicate(dgzs1.get_zvec());
 
         auto zvec_kleene_plus = gen_transitive_closure(zvec1);
@@ -105,8 +108,7 @@ public:
     }
 
     static dgzone_set<T> intersection(const dgzone_set<T> &dgzs1, const dgzone_set<T> &dgzs2){
-        auto notation = dgzs1.get_notation() + symbols.at(op_type::sinter) + dgzs2.get_notation();
-
+        auto notation = "("+dgzs1.get_notation() + symbols.at(op_type::sinter) + dgzs2.get_notation()+")";
         std::vector<std::shared_ptr<gen_zone>> zvec1, zvec2;
         for(auto z : dgzs1.get_zvec()){
             zvec1.push_back(std::dynamic_pointer_cast<gen_zone>(z));
@@ -123,8 +125,7 @@ public:
     }
 
     static dgzone_set<T> set_union(const dgzone_set<T> &dgzs1, const dgzone_set<T> &dgzs2){
-        auto notation = dgzs1.get_notation() + symbols.at(op_type::sunion) + dgzs2.get_notation();
-
+        auto notation = "("+dgzs1.get_notation() + symbols.at(op_type::sunion) + dgzs2.get_notation()+")";
         std::vector<std::shared_ptr<gen_zone>> zvec1, zvec2;
         for(auto z : dgzs1.get_zvec()){
             zvec1.push_back(std::dynamic_pointer_cast<gen_zone>(z));
@@ -157,9 +158,12 @@ public:
         return dgzone_set<T>(zvec_res, notation);
     }
 
-    static dgzone_set<T> duration_restriction(dgzone_set<T> &dgzs1, T dmin, T dmax, std::string restriction_interval_str){
+    static dgzone_set<T> duration_restriction(dgzone_set<T> &dgzs1, T dmin, T dmax){
+        auto dsmin = dmin.get_str();
+        auto dsmax = dmax.get_str();
+        std::string restriction_interval_str = " ["+dsmin+","+dsmax+"] ";
         // Note: Added restriction_interval_str to simplify and avoid special handling of rationals inside this function
-        auto notation = dgzs1.get_notation() + restriction_interval_str;
+        auto notation = "("+dgzs1.get_notation() + restriction_interval_str+")";
 
         auto zvec1 = dgzs1.get_zvec();
         std::vector<std::shared_ptr<gen_zone>> zvec_duration_restricted;
@@ -225,6 +229,17 @@ public:
     }
 };
 
+
+template <class T>
+inline std::ostream& operator<<(
+    std::ostream &os, const dgzone_set<T> &z){
+    os<<z.get_notation()<<"-->"<<"\n";
+    auto ided_vecs = z.get_zvec();
+    for(auto izvec_ptr : ided_vecs){
+        os<<*izvec_ptr<<"\n";
+    }
+    return os;
+}
 
 }
 
