@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 import io
 from PIL import Image
 
-class dgzone_set(object):
+class dgzonesetq(object):
     """Python wrapper for dgzone_set C++ class"""
 
     def __init__(self, zsq, notation=""):
@@ -17,19 +17,24 @@ class dgzone_set(object):
         """
 
         # Assuming data is a rational zone_set and a string notation for dgzone_set
-        self.container = ext.dgzone_set(zsq.container, notation)
-        self.notation = notation
+        if isinstance(zsq, ext.dgzone_set):
+            self.container = zsq
+            self.notation = zsq.get_notation()
+        else:
+            self.container = ext.dgzone_set(zsq.container, notation)
+            self.notation = notation
 
     def __and__(self, other):
         """Intersection operator (&) for dgzone_set."""
-        return dgzone_set(self.intersection(other))
+        return dgzonesetq(self.intersection(other))
 
     def __or__(self, other):
         """Union operator (|) for dgzone_set."""
-        return dgzone_set(self.union(other))
+        return dgzonesetq(self.union(other))
 
-    def __concat__(self, other):
+    def __add__(self, other):
         """ Concatenation operator + for dgzone_set"""
+        return dgzonesetq(self.concatenation(other))
 
     def __str__(self):
         """String representation of the dgzone_set."""
@@ -54,7 +59,8 @@ class dgzone_set(object):
 
     def kleene_plus(self):
         """Perform Kleene plus operation on the dgzone_set."""
-        return ext.dgzone_set.kleene_plus(self.container)
+        kplus_container = ext.dgzone_set.kleene_plus(self.container)
+        return dgzonesetq(kplus_container)
 
     def duration_restriction(self, dmin, dmax):
         """Apply duration restriction on the dgzone_set."""

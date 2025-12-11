@@ -158,9 +158,10 @@ public:
         return dgzone_set<T>(zvec_res, notation);
     }
 
-    static dgzone_set<T> duration_restriction(dgzone_set<T> &dgzs1, T dmin, T dmax){
-        auto dsmin = dmin.get_str();
-        auto dsmax = dmax.get_str();
+    static dgzone_set<T> duration_restriction(dgzone_set<T> &dgzs1, std::string dsmin, std::string dsmax){
+        mpq_class dmin(dsmin);
+        mpq_class dmax(dsmax);
+
         std::string restriction_interval_str = " ["+dsmin+","+dsmax+"] ";
         // Note: Added restriction_interval_str to simplify and avoid special handling of rationals inside this function
         auto notation = "("+dgzs1.get_notation() + restriction_interval_str+")";

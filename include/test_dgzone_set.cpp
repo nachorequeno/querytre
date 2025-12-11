@@ -50,10 +50,8 @@ int main(){
 
     auto dlims1 = "2/100";
     auto dlims2 = "6/100";
-    mpq_class dlim1(dlims1);
-    mpq_class dlim2(dlims2);
 
-    auto dgres4 = dgzone_set<mpq_class>::duration_restriction(dgres3, dlim1, dlim2);
+    auto dgres4 = dgzone_set<mpq_class>::duration_restriction(dgres3, dlims1, dlims2);
     cout<<"Duration restriction:\n"<<dgres4<<endl;
 
     std::pair<mpq_class, mpq_class> result_interval(q1, q2);
