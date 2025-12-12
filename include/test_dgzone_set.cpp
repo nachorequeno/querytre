@@ -54,7 +54,7 @@ int main(){
     auto dgres4 = dgzone_set<mpq_class>::duration_restriction(dgres3, dlims1, dlims2);
     cout<<"Duration restriction:\n"<<dgres4<<endl;
 
-    std::pair<mpq_class, mpq_class> result_interval(q1, q2);
+    std::pair<std::string, std::string> result_interval(q1.get_str(), q2.get_str());
 
     cout<<"("<<result_interval.first<<","<<result_interval.second<<")"<<endl;
 
@@ -72,8 +72,7 @@ int main(){
         cout<<"("<<diag_interval.first<<","<<diag_interval.second<<")"<<endl;
     }
 
-    // Infer Kleene test
-    // [TODO] Kleene test pending for n > 2 number of concatenations
+    // Infer Kleene test 1
     int kindex = 1;
     cout<<"Kleene plus test one"<<endl;
     auto kplus_vec = dgzone_set<mpq_class>::infer_kleene_plus(dgres5, kindex, dgres5, result_interval);
@@ -87,8 +86,9 @@ int main(){
     mpq_class q3("18/100");
     mpq_class q4("4/10");
     std::pair<mpq_class, mpq_class> result_interval2(q3, q4);
+    result_interval = std::make_pair("18/100", "4/10");
 
-    kplus_vec = dgzone_set<mpq_class>::infer_kleene_plus(dgres6, kindex, dgs3, result_interval2);
+    kplus_vec = dgzone_set<mpq_class>::infer_kleene_plus(dgres6, kindex, dgs3, result_interval);
     for(auto diag_interval : kplus_vec){
         cout<<"("<<diag_interval.first<<","<<diag_interval.second<<")"<<endl;
     }

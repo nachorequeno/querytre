@@ -188,9 +188,9 @@ public:
         return dgzone_set<T>(zvec_res, notation);
     }
     
-    static std::vector<std::pair<T,T>> infer_concatenation(dgzone_set<T> &dgres, int index, 
+    static std::vector<std::pair<std::string,std::string>> infer_concatenation(dgzone_set<T> &dgres, int index, 
                 dgzone_set<T> &dg1, dgzone_set<T> &dg2,
-                std::pair<T,T> &time_interval){
+                const std::pair<std::string, std::string> &time_interval_str){
         auto zres_ptr = dgres.get_indexed_zone_ptr_at_index(index);
         auto zres = zres_ptr->get_myzone();
         auto chids = zres_ptr->get_chids();
@@ -204,17 +204,23 @@ public:
         auto z2_ptr = dg2.get_indexed_zone_ptr_at_index(chid2);
         auto z2 = z2_ptr->get_myzone();
 
-        T interim_time_point =  timedrel::infer_seq_comp(zres, z1, z2, time_interval);
+        mpq_class duration_lbound(time_interval_str.first);
+        mpq_class duration_ubound(time_interval_str.second);
 
-        std::vector<std::pair<T,T>> split_time_intervals;
-        split_time_intervals.push_back(std::make_pair(time_interval.first, interim_time_point));
-        split_time_intervals.push_back(std::make_pair(interim_time_point, time_interval.second));
+        auto time_interval = std::make_pair(duration_lbound, duration_ubound);
+        T interim_time_point =  timedrel::infer_seq_comp(zres, z1, z2, time_interval);
+        std::string str_interim_time_point = interim_time_point.get_str();
+
+        std::vector<std::pair<std::string,std::string>> split_time_intervals;
+        split_time_intervals.push_back(std::make_pair(time_interval_str.first, str_interim_time_point));
+        split_time_intervals.push_back(std::make_pair(str_interim_time_point, time_interval_str.second));
 
         return split_time_intervals;
     }
 
-    static std::vector<std::pair<T,T>> infer_kleene_plus(dgzone_set<T> &dgres, int index, dgzone_set<T> &dg1,
-            std::pair<T,T> &time_interval){
+    static std::vector<std::pair<std::string,std::string>> infer_kleene_plus(
+            dgzone_set<T> &dgres, int index, dgzone_set<T> &dg1,
+            const std::pair<std::string,std::string> &time_interval){
         auto zres_ptr = dgres.get_indexed_zone_ptr_at_index(index);
         auto zres = zres_ptr->get_myzone();
         auto chids = zres_ptr->get_chids();

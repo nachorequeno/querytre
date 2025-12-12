@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <gmpxx.h>
 #include <gmp.h>
 
@@ -29,8 +30,8 @@ PYBIND11_MODULE(timedrel_ext_diag, m) {
         .def_static("intersection", &dgzone_set_type::intersection)
         .def_static("set_union", &dgzone_set_type::set_union)
         .def_static("duration_restriction", &dgzone_set_type::duration_restriction)
-        // .def_static("infer_concatenation", &dgzone_set_type::infer_concatenation)
-        // .def_static("infer_kleene_plus", &dgzone_set_type::infer_kleene_plus)
+        .def_static("infer_concatenation", &dgzone_set_type::infer_concatenation)
+        .def_static("infer_kleene_plus", &dgzone_set_type::infer_kleene_plus)
         .def("__str__", [](const dgzone_set_type &self) {
             std::ostringstream os;
             os << self;

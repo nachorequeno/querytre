@@ -170,7 +170,7 @@ std::pair<T,T> zone_interior_point(timedrel::zone<T> &z){
 // Find t2 such that (t1,t2) in z1 and (t2,t3) in z2 and (t1, t3) in zres.
 template <class T>
 T infer_seq_comp(const timedrel::zone<T> &zres, const timedrel::zone<T> &z1, const timedrel::zone<T> &z2, 
-    std::pair<T,T> &inival){
+    const std::pair<T,T> &inival){
     assertm((std::is_same<float, T>::value or
             std::is_same<double, T>::value or 
             std::is_same<mpq_class, T>::value)
@@ -322,12 +322,14 @@ T infer_seq_comp_debug(const timedrel::zone<T> &zres, const timedrel::zone<T> &z
 }
 
 template <class T>
-std::vector<std::pair<T,T>> infer_mult_seq_comp(const timedrel::zone<T> &res, 
-    std::vector<timedrel::zone<T>> &zlist, std::pair<T,T> &inival){
+std::vector<std::pair<std::string,std::string>> infer_mult_seq_comp(const timedrel::zone<T> &res, 
+    std::vector<timedrel::zone<T>> &zlist, const std::pair<std::string,std::string> &inival_str){
     assertm((std::is_same<float, T>::value or
             std::is_same<double, T>::value or 
             std::is_same<mpq_class, T>::value)
             , "Type not supported (only float, double and rationals supported).");
+
+    auto inival = std::make_pair(mpq_class(inival_str.first), mpq_class(inival_str.second));
     T lb = inival.first;
     T ub = inival.second;
 
@@ -335,7 +337,7 @@ std::vector<std::pair<T,T>> infer_mult_seq_comp(const timedrel::zone<T> &res,
     auto lb_ub = timedrel::zone<T>::make({lb,lb,ub,ub,ub-lb,ub-lb},{1,1,1,1,1,1});
     assertm(timedrel::zone<T>::includes(res, lb_ub), "Point not in the zone!");
 
-    std::vector<std::pair<T,T>> ival_res(zlist.size(),{-1,-1});
+    std::vector<std::pair<std::string,std::string>> ival_res(zlist.size(),{"-1","-1"});
 
     // Initialize accumulation vector
     auto tz = timedrel::zone<T>::make({0,0,0,0,0});
@@ -371,12 +373,12 @@ std::vector<std::pair<T,T>> infer_mult_seq_comp(const timedrel::zone<T> &res,
         timedrel::zone<T> tz1 = seq_comp_acc[j-1];
         timedrel::zone<T> tz2  = zlist[j];
         T tmid = infer_seq_comp(tzres, tz1, tz2, temp_ival);
-        ival_res[j] = {tmid, temp_ival.second};
+        ival_res[j] = std::make_pair(tmid.get_str(), temp_ival.second.get_str());
         temp_ival.second = tmid;
 
         j--;
     }
-    ival_res[0] = temp_ival;
+    ival_res[0] = std::make_pair(temp_ival.first.get_str(), temp_ival.second.get_str());
     return ival_res;
 }
 

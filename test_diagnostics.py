@@ -33,3 +33,14 @@ print(zst4)
 
 zst5 = dgs3.duration_restriction("11/100", "13/100")
 print(zst5)
+
+diag_vec = zst1.infer_concatenation(0, dgs1, dgs2, ("16/100", "17/100"))
+print(diag_vec)
+
+kindex = 1
+kplus_vec = zst4.infer_kleene_plus(kindex, zst3, ("16/100", "17/100"));
+print(kplus_vec)
+
+kindex = 4
+kplus_vec = zst4.infer_kleene_plus(kindex, dgs3, ("18/100", "4/10"));
+print(kplus_vec)

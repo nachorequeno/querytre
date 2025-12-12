@@ -8,12 +8,13 @@ from PIL import Image
 class dgzonesetq(object):
     """Python wrapper for dgzone_set C++ class"""
 
-    def __init__(self, zsq, notation=""):
+    def __init__(self, zsq, notation="", children=[], op_type="atomic"):
         """Initialize the dgzone_set object.
 
         Args:
             data: Rational zone set from which the dgzone_set will be created.
             notation (str, optional): The notation associated with the dgzone_set.
+            children (list, optional): The list of children in the parse tree.
         """
 
         # Assuming data is a rational zone_set and a string notation for dgzone_set
@@ -24,21 +25,29 @@ class dgzonesetq(object):
             self.container = ext.dgzone_set(zsq.container, notation)
             self.notation = notation
 
+        self.children = children
+        self.op_type = op_type
+
     def __and__(self, other):
         """Intersection operator (&) for dgzone_set."""
-        return dgzonesetq(self.intersection(other))
+        return dgzonesetq(self.intersection(other), children=[self, other], op_type="and")
 
     def __or__(self, other):
         """Union operator (|) for dgzone_set."""
-        return dgzonesetq(self.union(other))
+        return dgzonesetq(self.union(other), children=[self, other], op_type="or")
 
     def __add__(self, other):
         """ Concatenation operator + for dgzone_set"""
-        return dgzonesetq(self.concatenation(other))
+        return dgzonesetq(self.concatenation(other), children=[self, other], op_type="concat")
 
     def __str__(self):
         """String representation of the dgzone_set."""
-        return str(self.container)
+        retstr = self.op_type+"\n"
+        retstr += str(self.children)+"\n"
+        retstr += str(self.container)
+        retstr += self.notation
+
+        return retstr
 
     def get_notation(self):
         """Get the notation of the dgzone_set."""
@@ -60,16 +69,17 @@ class dgzonesetq(object):
     def kleene_plus(self):
         """Perform Kleene plus operation on the dgzone_set."""
         kplus_container = ext.dgzone_set.kleene_plus(self.container)
-        return dgzonesetq(kplus_container)
+        return dgzonesetq(kplus_container, children=[self], op_type="kplus")
 
     def duration_restriction(self, dmin, dmax):
         """Apply duration restriction on the dgzone_set."""
-        return ext.dgzone_set.duration_restriction(self.container, dmin, dmax)
+        dr_container = ext.dgzone_set.duration_restriction(self.container, dmin, dmax)
+        return dgzonesetq(dr_container, children=[self], op_type="durarest")
 
-    # def infer_concatenation(self, index, dg1, dg2, time_interval):
-    #     """Infer concatenation for a dgzone_set."""
-    #     return ext.dgzone_set.infer_concatenation(self.container, index, dg1.container, dg2.container, time_interval)
+    def infer_concatenation(self, index, dg1, dg2, time_interval):
+        """Infer concatenation for a dgzone_set."""
+        return ext.dgzone_set.infer_concatenation(self.container, index, dg1.container, dg2.container, time_interval)
 
-    # def infer_kleene_plus(self, index, dg1, time_interval):
-    #     """Infer Kleene plus for a dgzone_set."""
-    #     return ext.dgzone_set.infer_kleene_plus(self.container, index, dg1.container, time_interval)
+    def infer_kleene_plus(self, index, dg1, time_interval):
+        """Infer Kleene plus for a dgzone_set."""
+        return ext.dgzone_set.infer_kleene_plus(self.container, index, dg1.container, time_interval)
