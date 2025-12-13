@@ -83,3 +83,25 @@ class dgzonesetq(object):
     def infer_kleene_plus(self, index, dg1, time_interval):
         """Infer Kleene plus for a dgzone_set."""
         return ext.dgzone_set.infer_kleene_plus(self.container, index, dg1.container, time_interval)
+
+    def child_zone_indices(self, index):
+        return self.container.child_zone_indices(index)
+
+    def infer(self, index, time_interval):
+        if self.op_type == "and":
+            return [time_interval]
+        elif self.op_type == "or":
+            return [time_interval]
+        elif self.op_type == "concat":
+            assert len(self.children) == 2
+            child1 = self.children[0]
+            child2 = self.children[1]
+            return self.infer_concatenation(index, child1, child2, time_interval)
+        elif self.op_type == "kplus":
+            assert len(self.children) == 1
+            child = self.children[0]
+            return self.infer_kleene_plus(index, child, time_interval)
+        elif self.op_type == "durarest":
+            return [time_interval]
+        elif self.op_type == "atomic":
+            return [time_interval]

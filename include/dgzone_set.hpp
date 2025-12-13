@@ -234,6 +234,13 @@ public:
 
         return infer_mult_seq_comp(zres, ch_zone_list, time_interval);
     }
+
+    std::vector<int> child_zone_indices(int index){
+        auto zone_ptr = this->get_indexed_zone_ptr_at_index(index);
+        auto child_indices = zone_ptr->get_chids();
+
+        return child_indices;
+    }
 };
 
 
