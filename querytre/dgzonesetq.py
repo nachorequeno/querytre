@@ -5,10 +5,23 @@ from matplotlib.figure import Figure
 import io
 from PIL import Image
 
+class diagtree(object):
+    """Diagnostics tree for TRE"""
+    def __init__(self, time_interval, notation="", children=None):
+        if children is None:
+            children = []
+        self.time_interval = time_interval
+        self.notation      = notation
+        self.children      = children
+    def print(self):
+        print(self.notation, self.time_interval)
+        for child in self.children:
+            child.print()
+
 class dgzonesetq(object):
     """Python wrapper for dgzone_set C++ class"""
 
-    def __init__(self, zsq, notation="", children=[], op_type="atomic"):
+    def __init__(self, zsq, notation="", children=None, op_type="atomic"):
         """Initialize the dgzone_set object.
 
         Args:
@@ -16,6 +29,8 @@ class dgzonesetq(object):
             notation (str, optional): The notation associated with the dgzone_set.
             children (list, optional): The list of children in the parse tree.
         """
+        if children is None:
+            children = []
 
         # Assuming data is a rational zone_set and a string notation for dgzone_set
         if isinstance(zsq, ext.dgzone_set):
@@ -89,9 +104,9 @@ class dgzonesetq(object):
 
     def infer(self, index, time_interval):
         if self.op_type == "and":
-            return [time_interval]
+            return [time_interval, time_interval]
         elif self.op_type == "or":
-            return [time_interval]
+            return [time_interval, time_interval]
         elif self.op_type == "concat":
             assert len(self.children) == 2
             child1 = self.children[0]
@@ -104,4 +119,24 @@ class dgzonesetq(object):
         elif self.op_type == "durarest":
             return [time_interval]
         elif self.op_type == "atomic":
-            return [time_interval]
+            return []
+
+    def create_tree(self, index, time_interval):
+        notation = self.notation
+        diag_children = []
+
+        child_tintervals = self.infer(index, time_interval)
+        child_zindices = self.child_zone_indices(index)
+        assert len(child_tintervals) == len(child_zindices)
+
+        if self.op_type == "kplus":
+            for czindex, ctinterval in zip(child_zindices, child_tintervals):
+                child_tree = self.children[0].create_tree(czindex, ctinterval)
+                diag_children.append(child_tree)
+        else:
+            for czindex, ctinterval, child in zip(child_zindices, child_tintervals, self.children):
+                if czindex >= 0:
+                    child_tree = child.create_tree(czindex, ctinterval)
+                    diag_children.append(child_tree)
+
+        return diagtree(time_interval, notation, diag_children)
