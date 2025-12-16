@@ -4,6 +4,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import io
 from PIL import Image
+from anytree import Node, RenderTree
 
 class diagtree(object):
     """Diagnostics tree for TRE"""
@@ -17,6 +18,18 @@ class diagtree(object):
         print(self.notation, self.time_interval)
         for child in self.children:
             child.print()
+    def anytree_node(self, parent=None):
+        notation = self.notation
+        whole_node_label = notation + " <--> [" + self.time_interval[0] + "," + self.time_interval[1] + "]"
+        if parent is None:
+            whole_node = Node(whole_node_label)
+        else:
+            whole_node = Node(whole_node_label, parent=parent)
+        for child in self.children:
+            child_tree_node = child.anytree_node(parent=whole_node)
+
+        return whole_node
+
 
 class dgzonesetq(object):
     """Python wrapper for dgzone_set C++ class"""

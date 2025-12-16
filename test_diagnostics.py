@@ -1,3 +1,5 @@
+from anytree.exporter import UniqueDotExporter
+
 from querytre import zonesetq
 from querytre import dgzonesetq
 
@@ -113,3 +115,7 @@ print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 dt = zst6.create_tree(kindex, ("18/100", "4/10"))
 dt.print()
 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+# Visualize and store as image
+diag_root_node = dt.anytree_node()
+UniqueDotExporter(diag_root_node).to_picture("diag.png")
