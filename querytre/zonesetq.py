@@ -44,6 +44,11 @@ class zoneset(object):
     def __eq__(self, other):
         return zoneset.includes(self, other) and zoneset.includes(other, self)
 
+    def add2(self, values, signs):
+        args = [ext.lower_bound(*item) if i % 2 == 0 else ext.upper_bound(*item) for i, item in enumerate(zip(values, signs))]
+        zone_i = ext.zone.make(*args)
+        self.container.add(zone_i)
+
     # [TODO] We cannot directly pass rationals from Python to C++
     def add(self, bmin, bmax, emin, emax, dmin, dmax):
         self.container.add(ext.zone.make(ext.geq(bmin), ext.lt(bmax),ext.gt(emin), ext.leq(emax), ext.gt(dmin), ext.leq(dmax)))

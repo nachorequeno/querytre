@@ -42,6 +42,12 @@ class zoneset(object):
     def __eq__(self, other):
         return zoneset.includes(self, other) and zoneset.includes(other, self)
 
+    def add2(self, values, signs):
+        args = [ext.lower_bound(*item) if i % 2 == 0 else ext.upper_bound(*item) for i, item in enumerate(zip(values, signs))]
+        zone_i = ext.zone.make(*args)
+        self.container.add(zone_i)
+
+
     def add(self, bmin, bmax, emin, emax, dmin, dmax):
         self.container.add(ext.zone.make(ext.geq(bmin), ext.lt(bmax),ext.gt(emin), ext.leq(emax), ext.gt(dmin), ext.leq(dmax)))
 
@@ -57,11 +63,21 @@ class zoneset(object):
     def concatenate(self, other):
         return zoneset.concatenation(self, other)
 
+    def includes(self, other):
+        return ext.includes(self.container, other.container)
+
     def iterate(self):
         return zoneset.transitive_closure(self)
 
     def empty(self):
         return self.container.empty()
+
+    def get_as_rationals(self):
+        from .zonesetq import zoneset as zonesetq
+        return zonesetq(self.container.get_as_rationals())
+
+    def time_robustness_translation(self, t, tp, s, e):
+        return ext.time_robustness_translation(self.container, t, tp, s, e)
 
     @classmethod
     def from_periods(cls, periods, anchor=None):
