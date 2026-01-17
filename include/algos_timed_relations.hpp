@@ -443,20 +443,14 @@ static std::vector<std::shared_ptr<gen_zone>> gen_transitive_closure(const std::
 
     std::vector<std::shared_ptr<gen_zone>> znext;
 
-    while(true){
+    znext = gen_concatenation(zlast, zs);
+    while(not gen_includes(zplus, znext)){
+        // std::cout << znext << zplus << includes(zplus, znext) << std::endl;
+        zlast = znext;
+        zplus = gen_union(zplus, znext);
+        znext.clear();
 
         znext = gen_concatenation(zlast, zs);
-        // std::cout << znext << zplus << includes(zplus, znext) << std::endl;
-
-        if(not gen_includes(zplus, znext)) {
-            zlast = znext;
-            zplus = gen_union(zplus, znext);
-            znext.clear();
-
-        } else {
-            break;
-        }
-        
     }
     return zplus;
 }

@@ -725,20 +725,14 @@ public:
 
         zone_set_type znext;
 
-        while(true){
+        znext = concatenation(zlast, zs);
+        while(not includes(zplus, znext)){
+            // std::cout << znext << zplus << includes(zplus, znext) << std::endl;
+            zlast = znext;
+            zplus = set_union(zplus, znext);
+            znext.clear();
 
             znext = concatenation(zlast, zs);
-            // std::cout << znext << zplus << includes(zplus, znext) << std::endl;
-
-            if(not includes(zplus, znext)) {
-                zlast = znext;
-                zplus = set_union(zplus, znext);
-                znext.clear();
-
-            } else {
-                break;
-            }
-            
         }
 
     return zplus;
@@ -1313,7 +1307,9 @@ std::pair<T,T> get_time_robustness_translation_optimal(const zone_set<T> &zs_in,
     T eold_point = u;
     T enew_point = u;
     /* Compute robustness to the right */
-    for(int i=0; i < border_points_right.size(); i++){
+    int i = 0;
+    bool is_included = true;
+    while (i < border_points_right.size() and is_included){
         new_point = border_points_right[i];
         enew_point = eborder_points_right[i];
         auto zs_segment = timedrel::zone_set<T>();
@@ -1321,12 +1317,11 @@ std::pair<T,T> get_time_robustness_translation_optimal(const zone_set<T> &zs_in,
             eold_point, enew_point,
             u-l,u-l},{1,1,1,1,1,1});
 
-        if(timedrel::zone_set<T>::includes(zs_inter, zs_segment)){
-            old_point = new_point;
-            eold_point = enew_point;
-        }else{
-            break;
-        }
+        old_point = new_point;
+        eold_point = enew_point;
+
+        is_included = timedrel::zone_set<T>::includes(zs_inter, zs_segment);
+        i++
     }
     /* Assign robustness value to the right */
     rob_value_right = old_point - l;
@@ -1337,7 +1332,8 @@ std::pair<T,T> get_time_robustness_translation_optimal(const zone_set<T> &zs_in,
     enew_point = u;
     /* Compute robustness to the left */
     int i = border_points_left.size() - 1;
-    while(i >= 0){
+    bool is_included = true;
+    while(i >= 0 and is_included){
         new_point = border_points_left[i];
         enew_point = eborder_points_left[i];
         auto zs_segment = timedrel::zone_set<T>();
@@ -1345,12 +1341,10 @@ std::pair<T,T> get_time_robustness_translation_optimal(const zone_set<T> &zs_in,
             enew_point, eold_point,
             u-l,u-l},{1,1,1,1,1,1});
 
-        if(timedrel::zone_set<T>::includes(zs_inter, zs_segment)){
-            old_point = new_point;
-            eold_point = enew_point;
-        }else{
-            break;
-        }
+        old_point = new_point;
+        eold_point = enew_point;
+
+        is_included = timedrel::zone_set<T>::includes(zs_inter, zs_segment));
         i--;
     }
     /* Assign robustness value to the left */
