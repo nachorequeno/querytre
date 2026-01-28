@@ -34,6 +34,17 @@ ext_instance_rational = Pybind11Extension(
     extra_link_args=['-lgmp', '-lgmpxx'],
 )
 
+ext_instance_diag = Pybind11Extension(
+    'timedrel_ext_diag',
+    sources=['querytre/boost/timedrel_ext_diag.cpp'],
+    include_dirs=['include', '/usr/include'],
+    cxx_std=11,
+    # language = 'c++',
+    libraries=libraries,
+    library_dirs=['/usr/lib', '/usr/lib/x86_64-linux-gnu'],
+    extra_link_args=['-lgmp', '-lgmpxx'],
+)
+
 setup(
     name='querytre',
     packages=find_packages(),
@@ -45,5 +56,5 @@ setup(
     install_requires=['antlr4-python3-runtime==4.7.1',
                       'pybind11>=2.11'],
     ext_package='timedrel',
-    ext_modules=[ext_instance_int, ext_instance_float, ext_instance_rational]
+    ext_modules=[ext_instance_int, ext_instance_float, ext_instance_rational, ext_instance_diag]
 )

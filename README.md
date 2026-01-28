@@ -1,5 +1,7 @@
 # QueryTRE
 QueryTRE is a fork of [Timedrel] and [Montre] that exports Timed Regular Expressions to [ParetoLib].
+It supports the analysis of TRE with time intervals in integer/floating-point/rational numbers. 
+It also supports advanced features such as trace diagnostics (i.e., decomposition of traces into fragments of satisfaction/falsification intervals).
 
 [Timedrel]: https://github.com/doganulus/timedrel
 [Montre]: https://github.com/doganulus/montre
@@ -12,14 +14,15 @@ In order to install QueryTRE, run the following commands:
 pip3 install .
 ``
 
+# Compilation
 Alternatively, you can compile and pack the library into a *.whl file.
 
 ``
-python3 setup.py bdist_wheel --universal --force-reinstall
+python3 setup.py bdist_wheel --universal
 ``
 
 ``
-pip3 install ./dist/querytre-0.1.0-py3-none-any.whl 
+pip3 install  --force-reinstall ./dist/querytre-0.1.0-py3-none-any.whl 
 ``
 
 Then, you can install the *.whl file using the installation procedure for Python libraries.
@@ -39,3 +42,9 @@ Alternatively, you can recompile the **querytre/parser** folder. To do so, you m
 ``
 user@localhost:~/querytre/querytre/parser$ java -jar antlr-4.7.13-complete.jar *.g4 -Dlanguage=Python3
 ``
+
+# Authors and acknowledgment
+This package is built on top of the work done at the VERIMAG laboratory located in the Grenoble city of France. This work is based on the theory of timed pattern matching developed by Dogan Ulus. Check out his [github page](https://github.com/doganulus).
+
+## License
+For open source projects, say how it is licensed.

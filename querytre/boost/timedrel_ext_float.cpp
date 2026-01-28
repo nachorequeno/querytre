@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <gmpxx.h>
 #include <gmp.h>
 
@@ -73,6 +74,7 @@ PYBIND11_MODULE(timedrel_ext_float, m) {
 
     m.def("filter", &zone_set_type::filter);
     m.def("includes", &zone_set_type::includes);
+    m.def<std::pair<double,double> (*)(const zone_set_type&, double, double, double, double)>("time_robustness_translation", &time_robustness_translation);
 
     // Set operations
     m.def<zone_set_type (*)(const zone_set_type&)>("complementation", &zone_set_type::complementation);
