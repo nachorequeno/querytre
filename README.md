@@ -29,7 +29,38 @@ Then, you can install the *.whl file using the installation procedure for Python
 
 **Remark**: On Linux/macOS you will probably need g++.
 
-# Dependencies: Antlr4
+# Dependencies: 
+## GMP and PPL
+QueryTRE uses **Parma Polyhedra Library (PPL)** for implementing the algorithms for TRE evaluation and diagnostics. 
+PPL depends on the **GNU Multiple Precision (GMP) Arithmetic Library**.
+Additionally, we use **pybind11** to create **Python3** bindings.
+You must install both libraries before installing QueryTRE.
+On Ubuntu, you can install them running:
+We provide a list of detailed commands for Ubuntu.
+
+1. Install Parma Polyhedra Library (PPL).
+```
+sudo apt install ppl-dev
+```
+2. Install C++ compiler.
+```
+sudo apt install g++
+```
+3. Install the GNU Multiple Precision (GMP) Arithmetic Library.
+```
+sudo apt install libgmp-dev
+```
+4. Install
+```
+./build.sh
+```
+5. Run
+```
+python3 ./examples/robustness_example_1.py
+```
+
+
+## Antlr4
 Lexer and parser.py files in **querytre/parser** folder are automatically generated using Antlr4 (version 4.7.13). 
 In order to correctly import this module in Python, you must install the exact version it was compiled for:
 
@@ -46,5 +77,5 @@ user@localhost:~/querytre/querytre/parser$ java -jar antlr-4.7.13-complete.jar *
 # Authors and acknowledgment
 This package is built on top of the work done at the VERIMAG laboratory located in the Grenoble city of France. This work is based on the theory of timed pattern matching developed by Dogan Ulus. Check out his [github page](https://github.com/doganulus).
 
-## License
+# License
 For open source projects, say how it is licensed.
