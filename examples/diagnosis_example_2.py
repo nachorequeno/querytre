@@ -3,7 +3,7 @@ from anytree.exporter import UniqueDotExporter
 from querytre import zonesetf
 from querytre import dgzonesetq
 
-from querytre.timedrel_ext_int import zone, lower_bound, upper_bound
+from timedrel.timedrel_ext_int import zone, lower_bound, upper_bound
 
 # Zone[(0.0, 2.0, 4.0, 5.0, 3.0, 4.0), (0, 1, 0, 1, 1, 1)],
 # Zone[(12.0, 15.0, 15.0, 19.0, 3.0, 4.0), (1, 0, 0, 0, 1, 1)]
