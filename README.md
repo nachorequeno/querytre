@@ -74,6 +74,11 @@ Alternatively, you can recompile the **querytre/parser** folder. To do so, you m
 user@localhost:~/querytre/querytre/parser$ java -jar antlr-4.7.13-complete.jar *.g4 -Dlanguage=Python3
 ``
 
+# Compatibility
+QueryTRE is compatible with Python 3.12. Some libraries may not be compatible with other versions of Python (e.g., typing.io is deprecated in Python 3.13+). We recommend you to use [pyenv](https://github.com/pyenv/pyenv) for managing virtual environments in Python.
+
+Note: Python 3.12 EOL is expected in 31st October 2028.
+
 # Authors and acknowledgment
 This package is built on top of the work done at the VERIMAG laboratory located in the Grenoble city of France. This work is based on the theory of timed pattern matching developed by Dogan Ulus. Check out his [github page](https://github.com/doganulus).
 
